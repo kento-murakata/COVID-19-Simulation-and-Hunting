@@ -12,6 +12,7 @@ public class PersonBehaviour : MonoBehaviour
     public float minPositionZ = -25.0f;
     public float randomTime = 10.0f;
 
+    private Vector3 personPosition;
     private Vector3 targetPosition;
     private float time;
 
@@ -30,7 +31,7 @@ public class PersonBehaviour : MonoBehaviour
 
         if(time <= randomTime)
         {
-            transform.position = Vector3.MoveTowards(
+            personPosition = Vector3.MoveTowards(
                 transform.position, 
                 targetPosition, 
                 0.01F);
@@ -43,7 +44,7 @@ public class PersonBehaviour : MonoBehaviour
             1,
             Random.Range(minPositionZ, maxPositionZ));
         }
-
+        transform.position = personPosition;
 
     }
    
