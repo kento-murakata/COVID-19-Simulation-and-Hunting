@@ -5,47 +5,121 @@ using UnityEngine.AI;
 
 public class PersonBehaviour : MonoBehaviour
 {
-    public GameObject person;
-    public float maxPositionX = 25.0f;
-    public float minPositionX = -25.0f;
-    public float maxPositionZ = 25.0f;
-    public float minPositionZ = -25.0f;
-    public float randomTime = 10.0f;
+    [SerializeField]
+    private GameObject stageObj;
 
-    private Vector3 personPosition;
-    private Vector3 targetPosition;
-    private float time;
+    [SerializeField]
+    private Color directionColor = Color.blue;
 
+    //TODO change randomly according to character
+    [SerializeField]
+    private float moveDuration = 5.0f;
+
+    [SerializeField]
+    private float userHealthPoint = 100;
+
+    // health status threshold
+    public float threshold_notContagious;
+    public float threshold_Contagious;
+    public float threshold_isolation;
+
+    private NavMeshAgent m_navMesh;
+
+    //TODO move spawnRange to GameManager
+    private float maxPositionX;
+    private float minPositionX;
+    private float maxPositionZ;
+    private float minPositionZ;
+
+    public enum UserStatus
+    {
+        Health,
+        NotContagious,
+        Contagious,
+        Isolation,
+    }
+
+    public UserStatus CurrentStatus
+    {
+        get
+        {
+            //ä¥êı_ì`êıïsâ¬
+            if (userHealthPoint < threshold_notContagious)
+            {
+                return UserStatus.NotContagious;
+            }
+            //ä¥êı_ì`êıâ¬î\
+            if (userHealthPoint < threshold_Contagious)
+            {
+                return UserStatus.Contagious;
+            }
+            //î≠è«äuó£
+            if (userHealthPoint < threshold_isolation)
+            {
+                return UserStatus.Isolation;
+            }
+            //åíçN
+            else
+            {
+                return UserStatus.Health;
+            }
+        }
+    }
 
     private void Awake()
     {
-        targetPosition = new Vector3 (
-            Random.Range(minPositionX,maxPositionX),
-            1,
-            Random.Range(minPositionZ,maxPositionZ));
+        m_navMesh = GetComponent<NavMeshAgent>();
+    }
+
+    private void Start()
+    {
+        // spawn range
+        maxPositionX = stageObj.transform.position.x + stageObj.transform.lossyScale.x * 5;
+        minPositionX = stageObj.transform.position.x - stageObj.transform.lossyScale.x * 5;
+        maxPositionZ = stageObj.transform.position.z + stageObj.transform.lossyScale.z * 5;
+        minPositionZ = stageObj.transform.position.z - stageObj.transform.lossyScale.z * 5;
+
+        // spawn object to target position
+        var randomPosition = new Vector3(
+           Random.Range(minPositionX, maxPositionX),
+           transform.localScale.y,
+           Random.Range(minPositionZ, maxPositionZ));
+
+        transform.position = randomPosition;
     }
 
     private void Update()
     {
-        time += Time.deltaTime;
-
-        if(time <= randomTime)
+        if (m_navMesh != null)
         {
-            personPosition = Vector3.MoveTowards(
-                transform.position, 
-                targetPosition, 
-                0.01F);
-        }
-        else
-        {
-            time = 0;
-            targetPosition = new Vector3(
-            Random.Range(minPositionX, maxPositionX),
-            1,
-            Random.Range(minPositionZ, maxPositionZ));
-        }
-        transform.position = personPosition;
+            if (!m_navMesh.hasPath)
+            {
+                float moveDurationX = Random.Range(-moveDuration, moveDuration);
+                float moveDurationZ = Random.Range(-moveDuration, moveDuration);
 
+                Vector3 targetPosition = new Vector3(
+                   transform.position.x + moveDurationX,
+                   transform.position.y,
+                   transform.position.z + moveDurationZ);
+
+                m_navMesh.isStopped = false;
+                m_navMesh.SetDestination(targetPosition);
+            }
+        }
     }
-   
+
+    private void OnDrawGizmos()
+    {
+        if (m_navMesh && m_navMesh.enabled)
+        {
+            Gizmos.color = directionColor;
+            var prePos = transform.position;
+            prePos.y = 0;
+            foreach (var pos in m_navMesh.path.corners)
+            {
+                Gizmos.DrawLine(prePos, pos);
+                prePos = pos;
+            }
+        }
+    }
 }
