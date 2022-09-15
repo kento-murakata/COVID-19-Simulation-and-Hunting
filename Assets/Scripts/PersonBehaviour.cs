@@ -115,7 +115,6 @@ public class PersonBehaviour : MonoBehaviour
             Gizmos.color = directionColor;
             var prePos = transform.position;
             prePos.y = 0;
-
             foreach (var pos in m_navMesh.path.corners)
             {
                 Gizmos.DrawLine(prePos, pos);
