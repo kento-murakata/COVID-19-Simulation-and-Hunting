@@ -46,6 +46,8 @@ public class PersonBehaviour : MonoBehaviour
         }
         transform.position = personPosition;
 
+        transform.position = personPosition;
+
     }
    
 }
