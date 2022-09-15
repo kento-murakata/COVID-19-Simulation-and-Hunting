@@ -35,6 +35,6 @@ public class ChartController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        
     }
 }
