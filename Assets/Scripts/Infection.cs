@@ -52,20 +52,28 @@ public class Infection : MonoBehaviour
 
         if (colPositive.GetComponent<Human>() == null) { return human.health; }
 
-        human.health = toInfectionNegative(totalContactTime);
+        human.health = ToInfectionNegative(totalContactTime);
 
         if ((int)human.health >= (int)Health.infectionNegative)
         {
-            StartCoroutine(toInfectionPositive());
+            StartCoroutine(ToInfectionPositive());
 
             human.health = Health.infectionPositive;
 
-            StartCoroutine(toOnsetAndQuarantine());
+            StartCoroutine(ToOnsetAndQuarantine());
 
             human.health = Health.onsetAndQuarantine;
         }
+
+
+
         return human.health;
     }
+
+
+
+
+
 
     private float GetTotalContactTime(GameObject colPositive)
     {
@@ -85,28 +93,7 @@ public class Infection : MonoBehaviour
     }
 
 
-
-    private IEnumerator<Health> InfectionProcess()
-    {
-        float waitTime = 3;
-
-        new WaitForSeconds(waitTime);
-
-        yield return Health.infectionPositive;
-
-
-        new WaitForSeconds(waitTime);
-
-        yield return Health.onsetAndQuarantine;
-    }
-
-
-
-
-
-
-
-    private Health toInfectionNegative(float totalContactTime)
+    private Health ToInfectionNegative(float totalContactTime)
     {
         //todoä¥êıÉAÉãÉSÉäÉYÉÄ
         timeInfection = 15 * Minuts; //15ï™Ç…ébíËê›íË
@@ -116,7 +103,7 @@ public class Infection : MonoBehaviour
 
 
 
-    IEnumerator toInfectionPositive()
+    IEnumerator ToInfectionPositive()
     {
         float waitTime = 3;
         yield return new WaitForSeconds(waitTime);
@@ -125,7 +112,7 @@ public class Infection : MonoBehaviour
 
 
 
-    IEnumerator toOnsetAndQuarantine()
+    IEnumerator ToOnsetAndQuarantine()
     {
         float waitTime = 3;
         yield return new WaitForSeconds(waitTime);
