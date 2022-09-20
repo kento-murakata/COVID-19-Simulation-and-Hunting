@@ -1,11 +1,5 @@
 {
   "dependencies": {
-    "com.monitor1394.xcharts": {
-      "version": "file:C:/Users/13059/Desktop/XCharts-3.0",
-      "depth": 0,
-      "source": "local",
-      "dependencies": {}
-    },
     "com.unity.collab-proxy": {
       "version": "1.17.1",
       "depth": 0,
