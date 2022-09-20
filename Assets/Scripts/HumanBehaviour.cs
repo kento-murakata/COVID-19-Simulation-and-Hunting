@@ -3,6 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
+public enum HealthStatus
+{
+    negative,
+    infectionNegative,
+    infectionPositive,
+    onsetAndQuarantine,
+}
+
 public class HumanBehaviour : MonoBehaviour
 {
     //TODO move stageObj to GameManager
@@ -24,16 +32,7 @@ public class HumanBehaviour : MonoBehaviour
     [SerializeField]
     private float detectRadius = 0.5f;
 
-    // health status threshold
-    [SerializeField]
-    private float threshold_notContagious;
-
-    [SerializeField]
-    private float threshold_contagious;
-
-    [SerializeField]
-    private float threshold_isolation;
-
+    private Rigidbody rBody;
     private NavMeshAgent m_navMesh;
     private HumanDetector m_detector;
     private Renderer m_bodyRenderer;
@@ -43,38 +42,14 @@ public class HumanBehaviour : MonoBehaviour
     private float maxPositionZ;
     private float minPositionZ;
 
-    public enum UserStatus
-    {
-        negative,
-        infectionNegative,
-        infectionPositive,
-        onsetAndQuarantine,
-    }
-
-    public UserStatus CurrentStatus
+    public HealthStatus healthStatus
     {
         get
         {
-            // NotContagious
-            if (userHealthPoint < threshold_notContagious)
-            {
-                return UserStatus.infectionNegative;
-            }
-            // Contagious
-            if (userHealthPoint < threshold_contagious)
-            {
-                return UserStatus.infectionPositive;
-            }
-            // Isolation
-            if (userHealthPoint < threshold_isolation)
-            {
-                return UserStatus.onsetAndQuarantine;
-            }
-            // Health
-            else
-            {
-                return UserStatus.negative;
-            }
+            Infection infection = new Infection();
+            HumanDetector detector = new HumanDetector();
+
+            return infection.Test(this, detector.ContactHumans);
         }
     }
 
@@ -82,6 +57,9 @@ public class HumanBehaviour : MonoBehaviour
     {
         SettingNavMeshAgent();
         SettingHumanDetector();
+
+        rBody = gameObject.AddComponent<Rigidbody>();
+        rBody.isKinematic = true;
     }
 
     private void Start()
@@ -92,7 +70,15 @@ public class HumanBehaviour : MonoBehaviour
     private void Update()
     {
         SetDestination();
-        ChangeBodyColor();
+        ChangeBodyColor(healthStatus);
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.transform.CompareTag("Human"))
+        {
+            m_navMesh.ResetPath();
+        }
     }
 
     // TODO setting NavMeshAgent
@@ -100,7 +86,6 @@ public class HumanBehaviour : MonoBehaviour
     {
         // add NavMeshAgent Component
         m_navMesh = gameObject.AddComponent<NavMeshAgent>();
-
         m_navMesh.speed = 1.0f;
     }
 
@@ -147,11 +132,31 @@ public class HumanBehaviour : MonoBehaviour
         }
     }
 
-    private void ChangeBodyColor()
+    private void ChangeBodyColor(HealthStatus status)
     {
         m_bodyRenderer = GetComponent<Renderer>();
-        m_bodyRenderer.material.color = Color.red;
+
+        switch (status)
+        {
+            case HealthStatus.infectionNegative:
+                m_bodyRenderer.material.color = Color.magenta;
+                break;
+            case HealthStatus.infectionPositive:
+                m_bodyRenderer.material.color = Color.magenta;
+                break;
+            case HealthStatus.onsetAndQuarantine:
+                m_bodyRenderer.material.color = Color.magenta;
+                break;
+            default:
+                break;
+        }
     }
+
+    IEnumerator Wait()
+    {
+        yield return new WaitForSeconds(2.0f);
+    }
+
 
     private void OnDrawGizmos()
     {

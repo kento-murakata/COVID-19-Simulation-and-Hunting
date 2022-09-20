@@ -11,7 +11,8 @@ public class HumanDetector : MonoBehaviour
     private new SphereCollider collider;
     private float detectRadius = 0.5f;
 
-    private List<Collider> contactPersons = new List<Collider>();
+    //TODO change from List to Array
+    private List<GameObject> contactHumans = new List<GameObject>();
 
     private GameObject humanObj;
 
@@ -31,6 +32,11 @@ public class HumanDetector : MonoBehaviour
         }
     }
 
+    public List<GameObject> ContactHumans
+    {
+        get { return contactHumans; }
+    }
+
     private void Awake()
     {
         rigidbody = gameObject.AddComponent<Rigidbody>();
@@ -46,18 +52,13 @@ public class HumanDetector : MonoBehaviour
         humanObj = transform.parent.gameObject;
     }
 
-    public List<Collider> ContactPersonList
-    {
-        get { return contactPersons; }
-    }
-
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Human"))
         {
-            if (!contactPersons.Contains(other))
+            if (!contactHumans.Contains(other.gameObject))
             {
-                contactPersons.Add(other);
+                contactHumans.Add(other.gameObject);
             }
         }
     }
@@ -66,9 +67,9 @@ public class HumanDetector : MonoBehaviour
     {
         if (other.CompareTag("Human"))
         {
-            if (contactPersons.Contains(other))
+            if (contactHumans.Contains(other.gameObject))
             {
-                contactPersons.Remove(other);
+                contactHumans.Remove(other.gameObject);
             }
         }
     }
@@ -76,7 +77,7 @@ public class HumanDetector : MonoBehaviour
     private void OnDrawGizmos()
     {
         Gizmos.color = directionColor;
-        foreach (var pos in contactPersons)
+        foreach (var pos in contactHumans)
         {
             var currentPos = humanObj.transform.position;
             var targetPos = pos.transform.position;
