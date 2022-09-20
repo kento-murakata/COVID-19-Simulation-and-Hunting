@@ -39,21 +39,23 @@ public class HumanBehaviour : MonoBehaviour
     [SerializeField]
     private Color directionColor = Color.blue; //進路可視化(デバッグ用)
 
-    private Rigidbody rBody;
+    private Rigidbody m_rBody;
     private NavMeshAgent m_navMesh;
     private HumanDetector m_detector;
     private Renderer m_bodyRenderer;
-
-    private HealthStatus currentStatus;
-    private HealthStatus preStatus;
-
-    private Infection infection;
-    private HumanDetector detector;
 
     private float maxPositionX;
     private float minPositionX;
     private float maxPositionZ;
     private float minPositionZ;
+
+    [SerializeField]
+    private HealthStatus currentStatus;
+    private HealthStatus preStatus;
+
+
+
+    private Infection infection;
 
     public HealthStatus healthStatus
     {
@@ -62,15 +64,13 @@ public class HumanBehaviour : MonoBehaviour
 
     private void Awake()
     {
-        SettingNavMeshAgent();
+        SettingHumanObject();
         SettingHumanDetector();
-        SettingRigidBody();
     }
 
     private void Start()
     {
         infection = new Infection();
-        detector = new HumanDetector();
 
         DeployObject();
     }
@@ -80,10 +80,9 @@ public class HumanBehaviour : MonoBehaviour
         SetDestination();
 
         CheckHealthStatus();
+        Debug.Log(healthStatus);
 
-        //Debug.Log(healthStatus);
-
-        //ChangeBodyColor(healthStatus);
+        ChangeBodyColor();
     }
 
     //人同士の衝突時に進路変更を実施
@@ -95,24 +94,21 @@ public class HumanBehaviour : MonoBehaviour
         }
     }
 
-    // setting NavMeshAgent
-    private void SettingNavMeshAgent()
+    private void SettingHumanObject()
     {
-        // add NavMeshAgent Component
+        // add NavMeshAgent Component for object movement
         m_navMesh = gameObject.AddComponent<NavMeshAgent>();
         m_navMesh.speed = 1.0f;
+
+        // add Rigidbody Component for collision detection
+        m_rBody = gameObject.AddComponent<Rigidbody>();
+        m_rBody.isKinematic = true;
     }
 
     private void SettingHumanDetector()
     {
         m_detector = GetComponentInChildren<HumanDetector>();
         m_detector.DetectRadius = detectRadius;
-    }
-
-    private void SettingRigidBody()
-    {
-        rBody = gameObject.AddComponent<Rigidbody>();
-        rBody.isKinematic = true;
     }
 
     private void DeployObject()
@@ -152,36 +148,35 @@ public class HumanBehaviour : MonoBehaviour
         }
     }
 
-
-
     private void CheckHealthStatus()
     {
-        currentStatus = infection.Test(this, detector.ContactHumans);
+        currentStatus = infection.Test(this, m_detector.ContactHumans);
     }
 
-    private void ChangeBodyColor(HealthStatus status)
+    private void ChangeBodyColor()
     {
-        if (preStatus != status)
+        if (preStatus != currentStatus)
         {
             m_bodyRenderer = GetComponent<Renderer>();
 
-            switch (status)
+            switch (currentStatus)
             {
                 case HealthStatus.infectionNegative:
                     m_bodyRenderer.material.color = Color.magenta;
                     break;
                 case HealthStatus.infectionPositive:
-                    m_bodyRenderer.material.color = Color.magenta;
+                    m_bodyRenderer.material.color = Color.red;
                     break;
                 case HealthStatus.onsetAndQuarantine:
-                    m_bodyRenderer.material.color = Color.magenta;
+                    m_bodyRenderer.material.color = Color.gray;
                     break;
                 default:
+                    m_bodyRenderer.material.color = Color.cyan;
                     break;
             }
 
-            preStatus = status;
         }
+        preStatus = currentStatus;
     }
 
     IEnumerator Wait()
