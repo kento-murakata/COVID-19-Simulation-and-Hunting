@@ -2,91 +2,82 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
+
 public class Infection : MonoBehaviour
 {
     private float preContactTime = 0f;
-    private float curContactTime = 0f;
-    private float interruptionTime = Time.fixedDeltaTime * 2; //2frame文
+    [SerializeField]
     private float totalContactTime = 0;
+    private float elapsedTime = 0;
 
     private float timeInfection;
-
-    List<GameObject> collider = new List<GameObject>();
-    Human human;
-
-    GameObject colPositive;
 
     private const float HealthRecovery = 3;
     private const float Minuts = 60;
 
-    private void Update()
-    {
-        Debug.Log("update ");
-        Test(human, collider);
-    }
 
-
-    public class Human
-    {
-        public Health health = Health.infectionPositive;
-    }
-
-    public enum Health
-    {
-        negative,
-        infectionNegative,
-        infectionPositive,
-        onsetAndQuarantine,
-    }
+    HealthStatus healthStatus;
 
     //todo getcomponent の複数回呼出しをまとめる
-    public IEnumerator<Health> Test(Human human, List<GameObject> collider)
+    public HealthStatus Test(HumanBehaviour human, List<GameObject> collider)
     {
-        if (human.health == Health.onsetAndQuarantine) { yield return human.health; }
+        healthStatus = human.healthStatus;
 
-        colPositive = collider.Find(col => (int)col.GetComponent<Human>().health >= (int)Health.infectionPositive);
+        if (healthStatus == HealthStatus.onsetAndQuarantine) { return healthStatus; }
 
-        float totalContactTime = GetTotalContactTime(colPositive);
+        if (collider.Count != 0 && collider[0].CompareTag("Person"))
+        {
+            Debug.Log(collider[0].GetComponent<HumanBehaviour>().healthStatus);
+        }
 
-        if (colPositive.GetComponent<Human>() == null) { yield return human.health; }
 
-        human.health = ToInfectionNegative(totalContactTime);
+        //getcomponentは重いためfindtagに変更するべき
+        var colPositive = collider.Find(col => (int)col.GetComponent<HumanBehaviour>().healthStatus >= (int)HealthStatus.infectionPositive);
 
-        if ((int)human.health >= (int)Health.infectionNegative)
+        totalContactTime = GetTotalContactTime(colPositive);
+
+        if (colPositive == null) { return healthStatus; }
+
+        healthStatus = ToInfectionNegative(totalContactTime);
+
+        if ((int)healthStatus >= (int)HealthStatus.infectionNegative)
         {
             StartCoroutine(ToInfectionPositive());
 
-            human.health = Health.infectionPositive;
+            healthStatus = HealthStatus.infectionPositive;
 
             StartCoroutine(ToOnsetAndQuarantine());
 
-            human.health = Health.onsetAndQuarantine;
+            healthStatus = HealthStatus.onsetAndQuarantine;
         }
-        yield return human.health;
+        return healthStatus;
     }
 
     private float GetTotalContactTime(GameObject colPositive)
     {
+        elapsedTime = Time.time - preContactTime;
         //接触していなかった時間分HPを回復させる
-        if (colPositive.GetComponent<Human>() != null)
+        if (colPositive != null)
         {
             //接触していたらHPをインクリメント
-            totalContactTime += Time.fixedDeltaTime;
+            totalContactTime += elapsedTime;
         }
         else
         {
-            totalContactTime -= Time.fixedDeltaTime * HealthRecovery;
+            totalContactTime -= elapsedTime * HealthRecovery;
             totalContactTime = totalContactTime < 0f ? 0f : totalContactTime;
         }
-        preContactTime = curContactTime;
+        preContactTime = Time.time;
         return totalContactTime;
     }
 
-    private Health ToInfectionNegative(float totalContactTime)
+    private HealthStatus ToInfectionNegative(float totalContactTime)
     {
         //todo感染アルゴリズム
         timeInfection = 15 * Minuts; //15分に暫定設定
-        return timeInfection < totalContactTime ? Health.infectionNegative : Health.negative;
+
+        return timeInfection < totalContactTime ? HealthStatus.infectionNegative : HealthStatus.negative;
     }
 
     IEnumerator ToInfectionPositive()
@@ -100,5 +91,4 @@ public class Infection : MonoBehaviour
         float waitTime = 3;
         yield return new WaitForSeconds(waitTime);
     }
-
 }
