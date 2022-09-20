@@ -19,7 +19,8 @@ public class Infection : MonoBehaviour
 
     HealthStatus healthStatus;
 
-    //todo getcomponent ‚Ì•¡”‰ñŒÄo‚µ‚ğ‚Ü‚Æ‚ß‚é
+
+    //todo getcomponent ã®è¤‡æ•°å›å‘¼å‡ºã—ã‚’ã¾ã¨ã‚ã‚‹
     public HealthStatus Test(HumanBehaviour human, List<GameObject> collider)
     {
         healthStatus = human.healthStatus;
@@ -31,10 +32,8 @@ public class Infection : MonoBehaviour
             Debug.Log(collider[0].GetComponent<HumanBehaviour>().healthStatus);
         }
 
-
-        //getcomponent‚Íd‚¢‚½‚ßfindtag‚É•ÏX‚·‚é‚×‚«
+        //getcomponentã¯é‡ã„ãŸã‚findtagã«å¤‰æ›´ã™ã‚‹ã¹ã
         var colPositive = collider.Find(col => (int)col.GetComponent<HumanBehaviour>().healthStatus >= (int)HealthStatus.infectionPositive);
-
         totalContactTime = GetTotalContactTime(colPositive);
 
         if (colPositive == null) { return healthStatus; }
@@ -57,10 +56,10 @@ public class Infection : MonoBehaviour
     private float GetTotalContactTime(GameObject colPositive)
     {
         elapsedTime = Time.time - preContactTime;
-        //ÚG‚µ‚Ä‚¢‚È‚©‚Á‚½ŠÔ•ªHP‚ğ‰ñ•œ‚³‚¹‚é
+        //æ¥è§¦ã—ã¦ã„ãªã‹ã£ãŸæ™‚é–“åˆ†HPã‚’å›å¾©ã•ã›ã‚‹
         if (colPositive != null)
         {
-            //ÚG‚µ‚Ä‚¢‚½‚çHP‚ğƒCƒ“ƒNƒŠƒƒ“ƒg
+            //æ¥è§¦ã—ã¦ã„ãŸã‚‰HPã‚’ã‚¤ãƒ³ã‚¯ãƒªãƒ¡ãƒ³ãƒˆ
             totalContactTime += elapsedTime;
         }
         else
@@ -74,8 +73,8 @@ public class Infection : MonoBehaviour
 
     private HealthStatus ToInfectionNegative(float totalContactTime)
     {
-        //todoŠ´õƒAƒ‹ƒSƒŠƒYƒ€
-        timeInfection = 15 * Minuts; //15•ª‚Éb’èİ’è
+        //todoæ„ŸæŸ“ã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ 
+        timeInfection = 15 * Minuts; //15åˆ†ã«æš«å®šè¨­å®š
 
         return timeInfection < totalContactTime ? HealthStatus.infectionNegative : HealthStatus.negative;
     }
