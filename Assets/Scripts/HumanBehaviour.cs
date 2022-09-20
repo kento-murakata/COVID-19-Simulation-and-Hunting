@@ -36,6 +36,7 @@ public class HumanBehaviour : MonoBehaviour
     private NavMeshAgent m_navMesh;
     private HumanDetector m_detector;
     private Renderer m_bodyRenderer;
+    private HealthStatus preStatus;
 
     private float maxPositionX;
     private float minPositionX;
@@ -70,7 +71,10 @@ public class HumanBehaviour : MonoBehaviour
     private void Update()
     {
         SetDestination();
-        ChangeBodyColor(healthStatus);
+
+        //Debug.Log(healthStatus);
+
+        //ChangeBodyColor(healthStatus);
     }
 
     private void OnTriggerEnter(Collider other)
@@ -134,21 +138,26 @@ public class HumanBehaviour : MonoBehaviour
 
     private void ChangeBodyColor(HealthStatus status)
     {
-        m_bodyRenderer = GetComponent<Renderer>();
-
-        switch (status)
+        if(preStatus != status)
         {
-            case HealthStatus.infectionNegative:
-                m_bodyRenderer.material.color = Color.magenta;
-                break;
-            case HealthStatus.infectionPositive:
-                m_bodyRenderer.material.color = Color.magenta;
-                break;
-            case HealthStatus.onsetAndQuarantine:
-                m_bodyRenderer.material.color = Color.magenta;
-                break;
-            default:
-                break;
+            m_bodyRenderer = GetComponent<Renderer>();
+
+            switch (status)
+            {
+                case HealthStatus.infectionNegative:
+                    m_bodyRenderer.material.color = Color.magenta;
+                    break;
+                case HealthStatus.infectionPositive:
+                    m_bodyRenderer.material.color = Color.magenta;
+                    break;
+                case HealthStatus.onsetAndQuarantine:
+                    m_bodyRenderer.material.color = Color.magenta;
+                    break;
+                default:
+                    break;
+            }
+
+            preStatus = status;
         }
     }
 
