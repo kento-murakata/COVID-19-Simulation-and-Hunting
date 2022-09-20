@@ -2,92 +2,133 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-
-
 public class Infection : MonoBehaviour
 {
     private float preContactTime = 0f;
-    [SerializeField]
+    private float curContactTime = 0f;
+    private float interruptionTime = Time.fixedDeltaTime * 2; //2frame•¶
     private float totalContactTime = 0;
-    private float elapsedTime = 0;
 
     private float timeInfection;
+
+    List<GameObject> collider = new List<GameObject>();
+    HumanBehaviour human;
+
+    GameObject colPositive;
 
     private const float HealthRecovery = 3;
     private const float Minuts = 60;
 
+    private void Update()
+    {
+        Debug.Log("update ");
+        Test(human, collider);
+    }
 
-    HealthStatus healthStatus;
+
+    //public class Human
+    //{
+    //    public Health health = Health.infectionPositive;
+    //}
+
+    //public enum Health
+    //{
+    //    negative,
+    //    infectionNegative,
+    //    infectionPositive,
+    //    onsetAndQuarantine,
+    //}
 
 
-    //todo getcomponent ã®è¤‡æ•°å›å‘¼å‡ºã—ã‚’ã¾ã¨ã‚ã‚‹
+
+    //todo getcomponent ‚Ì•¡”‰ñŒÄo‚µ‚ğ‚Ü‚Æ‚ß‚é
     public HealthStatus Test(HumanBehaviour human, List<GameObject> collider)
     {
-        healthStatus = human.healthStatus;
+        if (human.healthStatus == HealthStatus.onsetAndQuarantine) { return human.healthStatus; }
 
-        if (healthStatus == HealthStatus.onsetAndQuarantine) { return healthStatus; }
+        colPositive = collider.Find(col => (int)col.GetComponent<HumanBehaviour>().healthStatus >= (int)HealthStatus.infectionPositive);
 
-        if (collider.Count != 0 && collider[0].CompareTag("Person"))
+        float totalContactTime = GetTotalContactTime(colPositive);
+
+        if (colPositive.GetComponent<HumanBehaviour>() == null) { return human.healthStatus; }
+
+        var health = toInfectionNegative(totalContactTime);
+
+        if ((int)human.healthStatus >= (int)HealthStatus.infectionNegative)
         {
-            Debug.Log(collider[0].GetComponent<HumanBehaviour>().healthStatus);
+            StartCoroutine(toInfectionPositive());
+
+            health = HealthStatus.infectionPositive;
+
+            StartCoroutine(toOnsetAndQuarantine());
+
+            health = HealthStatus.onsetAndQuarantine;
         }
-
-        //getcomponentã¯é‡ã„ãŸã‚findtagã«å¤‰æ›´ã™ã‚‹ã¹ã
-        var colPositive = collider.Find(col => (int)col.GetComponent<HumanBehaviour>().healthStatus >= (int)HealthStatus.infectionPositive);
-        totalContactTime = GetTotalContactTime(colPositive);
-
-        if (colPositive == null) { return healthStatus; }
-
-        healthStatus = ToInfectionNegative(totalContactTime);
-
-        if ((int)healthStatus >= (int)HealthStatus.infectionNegative)
-        {
-            StartCoroutine(ToInfectionPositive());
-
-            healthStatus = HealthStatus.infectionPositive;
-
-            StartCoroutine(ToOnsetAndQuarantine());
-
-            healthStatus = HealthStatus.onsetAndQuarantine;
-        }
-        return healthStatus;
+        return human.healthStatus;
     }
 
     private float GetTotalContactTime(GameObject colPositive)
     {
-        elapsedTime = Time.time - preContactTime;
-        //æ¥è§¦ã—ã¦ã„ãªã‹ã£ãŸæ™‚é–“åˆ†HPã‚’å›å¾©ã•ã›ã‚‹
-        if (colPositive != null)
+        //ÚG‚µ‚Ä‚¢‚È‚©‚Á‚½ŠÔ•ªHP‚ğ‰ñ•œ‚³‚¹‚é
+        if (colPositive.GetComponent<HumanBehaviour>() != null)
         {
-            //æ¥è§¦ã—ã¦ã„ãŸã‚‰HPã‚’ã‚¤ãƒ³ã‚¯ãƒªãƒ¡ãƒ³ãƒˆ
-            totalContactTime += elapsedTime;
+            //ÚG‚µ‚Ä‚¢‚½‚çHP‚ğƒCƒ“ƒNƒŠƒƒ“ƒg
+            totalContactTime += Time.fixedDeltaTime;
         }
         else
         {
-            totalContactTime -= elapsedTime * HealthRecovery;
+            totalContactTime -= Time.fixedDeltaTime * HealthRecovery;
             totalContactTime = totalContactTime < 0f ? 0f : totalContactTime;
         }
-        preContactTime = Time.time;
+        preContactTime = curContactTime;
         return totalContactTime;
     }
 
-    private HealthStatus ToInfectionNegative(float totalContactTime)
+
+
+    private IEnumerator<HealthStatus> InfectionProcess()
     {
-        //todoæ„ŸæŸ“ã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ 
-        timeInfection = 15 * Minuts; //15åˆ†ã«æš«å®šè¨­å®š
+        float waitTime = 3;
+
+        new WaitForSeconds(waitTime);
+
+        yield return HealthStatus.infectionPositive;
+
+
+        new WaitForSeconds(waitTime);
+
+        yield return HealthStatus.onsetAndQuarantine;
+    }
+
+
+
+
+
+
+
+    private HealthStatus toInfectionNegative(float totalContactTime)
+    {
+        //todoŠ´õƒAƒ‹ƒSƒŠƒYƒ€
+        timeInfection = 15 * Minuts; //15•ª‚Éb’èİ’è
 
         return timeInfection < totalContactTime ? HealthStatus.infectionNegative : HealthStatus.negative;
     }
 
-    IEnumerator ToInfectionPositive()
+
+
+    IEnumerator toInfectionPositive()
     {
         float waitTime = 3;
         yield return new WaitForSeconds(waitTime);
     }
 
-    IEnumerator ToOnsetAndQuarantine()
+
+
+
+    IEnumerator toOnsetAndQuarantine()
     {
         float waitTime = 3;
         yield return new WaitForSeconds(waitTime);
     }
+
 }
