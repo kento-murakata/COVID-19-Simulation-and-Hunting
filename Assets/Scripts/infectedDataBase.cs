@@ -13,6 +13,8 @@ namespace InfectionSimulator
     //    トータル感染者。上と一緒
     //    病院使用率
 
+    //floatのリスト=> Graphへ
+
     //     */
     //    public class infectedDataBase : MonoBehaviour
     //    {
@@ -23,15 +25,23 @@ namespace InfectionSimulator
     //            ASYMPOTOMATIC,
     //            SYMPTONS,
     //            INFECTED;
-
-
     //        }
-    //        public void Day()
-    //        {
-    //            int dayCount; // ～日目の "～"の部分の変数
-    //            dayCount = 1;
-    //            string day = $"Day{dayCount}"; //Day1 を day に代入
-    //        }
+    public class EnemyManager : MonoBehaviour
+    {
+        GameObject[] enemyObjects;
+        int enemyNum;
+        void Start()
+        {
+            enemyObjects = GameObject.FindGameObjectsWithTag("Enemy");
+            enemyNum = enemyObjects.Length
+        }
+    }
+    public void Day()
+    {
+        int dayCount; // ～日目の "～"の部分の変数
+        dayCount = 1;
+        string day = $"Day{dayCount}"; //Day1 を day に代入
+    }
 
     //        public void CountDailyInfector()
     //        {
