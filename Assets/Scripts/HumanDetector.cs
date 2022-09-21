@@ -39,11 +39,8 @@ public class HumanDetector : MonoBehaviour
 
     private void Awake()
     {
-        rigidbody = gameObject.AddComponent<Rigidbody>();
-        rigidbody.isKinematic = true;
-
-        collider = gameObject.AddComponent<SphereCollider>();
-        collider.isTrigger = true;
+        rigidbody = GetComponent<Rigidbody>();
+        collider = GetComponent<SphereCollider>();
         collider.radius = detectRadius;
     }
 
