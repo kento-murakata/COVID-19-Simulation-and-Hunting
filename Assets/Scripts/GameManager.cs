@@ -78,8 +78,8 @@ public class GameManager:MonoBehaviour
     //Creat a Random Position
     public Vector3 LocationDeter()
     {
-        float maxPos = 0.5f;
-        float minPos = -0.5f;
+        float maxPos = 20.0f;
+        float minPos = -20.0f;
 
         Vector3 randomPos = new Vector3(
             Random.Range(minPos, maxPos),
