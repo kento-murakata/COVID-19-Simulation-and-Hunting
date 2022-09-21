@@ -41,7 +41,7 @@ public class infectedDataBase : MonoBehaviour
     private Dictionary<string, float> infectionNumDictionary;
 
     //
-    private float dayTime = 3600 * 24f; // GameManager.dayTime; Need to replace the valiable Kawasaki-san made.
+    private float dayTime = 0.1f;// GameManager.dayTime; Need to replace the valiable Kawasaki-san made.
 
 
 
@@ -51,8 +51,9 @@ public class infectedDataBase : MonoBehaviour
     #region Constructor
     public infectedDataBase()
     {
+        Debug.Log("CALL!!!!!!!!!!!!!");
         infectionNumDictionary = new Dictionary<string, float>();
-        infectionNumDictionary.Add("January", 0);
+        infectionNumDictionary.Add("January", 5);
         infectionNumDictionary.Add("February", 0);
         infectionNumDictionary.Add("March", 0);
         infectionNumDictionary.Add("April", 0);
@@ -64,6 +65,7 @@ public class infectedDataBase : MonoBehaviour
         infectionNumDictionary.Add("Octorber", 0);
         infectionNumDictionary.Add("Novenmber", 0);
         infectionNumDictionary.Add("December", 0);
+        MonthSetting();
     }
     //Initialization the dictionary
 
@@ -95,22 +97,19 @@ public class infectedDataBase : MonoBehaviour
         novEndTime = octEndTime + dayTime * DateTime.DaysInMonth(2021, 11);
         decEndTime = novEndTime + dayTime * DateTime.DaysInMonth(2021, 12);
     }
-    private GameObject[] SearchHuman()
-    {
-        GameObject[] humanArr = GameObject.FindGameObjectsWithTag("Human");
-        return humanArr;
-    }
+    
 
-    public void MonthlyNewInfector()
+    public void MonthlyNewInfector(GameObject[] humanArr)
     {
-        GameObject[] humanArr = SearchHuman();
+        //GameObject[] humanArr = SearchHuman();
         Debug.Log("Human: " + humanArr.Length);
-        for (int i = 0; i <= humanArr.Length; i++)
+        for (int i = 0; i < humanArr.Length; i++)
         {
             if (humanArr[i].GetComponent<Infection>().beInfectionNegativeTime != 0)
             {
                 float tempbeInfectionNegativeTime =
                 humanArr[i].GetComponent<Infection>().beInfectionNegativeTime;
+
                 if (tempbeInfectionNegativeTime <= janEndTime) { newInfectorOfJan++; }
                 else if (tempbeInfectionNegativeTime <= febEndTime) { newInfectorOfFeb++; }
                 else if (tempbeInfectionNegativeTime <= marEndTime) { newInfectorOfMar++; }
@@ -139,18 +138,18 @@ public class infectedDataBase : MonoBehaviour
         infectionNumDictionary["Novenmber"] = newInfectorOfNov;
         infectionNumDictionary["December"] = newInfectorOfDec;
 
-        Debug.Log("newInfectorOfJan: " + newInfectorOfJan);
-        Debug.Log("newInfectorOfFeb: " + newInfectorOfFeb);
-        Debug.Log("newInfectorOfMar: " + newInfectorOfMar);
-        Debug.Log("newInfectorOfApr: " + newInfectorOfApr);
-        Debug.Log("newInfectorOfMay: " + newInfectorOfMay);
-        Debug.Log("newInfectorOfJun: " + newInfectorOfJun);
-        Debug.Log("newInfectorOfJul: " + newInfectorOfJul);
-        Debug.Log("newInfectorOfAug: " + newInfectorOfAug);
-        Debug.Log("newInfectorOfSep: " + newInfectorOfSep);
-        Debug.Log("newInfectorOfOct: " + newInfectorOfOct);
-        Debug.Log("newInfectorOfNov: " + newInfectorOfNov);
-        Debug.Log("newInfectorOfDec: " + newInfectorOfDec);
+        //Debug.Log("newInfectorOfJan: " + newInfectorOfJan);
+        //Debug.Log("newInfectorOfFeb: " + newInfectorOfFeb);
+        //Debug.Log("newInfectorOfMar: " + newInfectorOfMar);
+        //Debug.Log("newInfectorOfApr: " + newInfectorOfApr);
+        //Debug.Log("newInfectorOfMay: " + newInfectorOfMay);
+        //Debug.Log("newInfectorOfJun: " + newInfectorOfJun);
+        //Debug.Log("newInfectorOfJul: " + newInfectorOfJul);
+        //Debug.Log("newInfectorOfAug: " + newInfectorOfAug);
+        //Debug.Log("newInfectorOfSep: " + newInfectorOfSep);
+        //Debug.Log("newInfectorOfOct: " + newInfectorOfOct);
+        //Debug.Log("newInfectorOfNov: " + newInfectorOfNov);
+        //Debug.Log("newInfectorOfDec: " + newInfectorOfDec);
     }
 }
 
