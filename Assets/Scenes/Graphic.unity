@@ -637,7 +637,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1166054562}
-        m_TargetAssemblyTypeName: GraphicButton, Assembly-CSharp
+        m_TargetAssemblyTypeName: ButtonManager, Assembly-CSharp
         m_MethodName: onGraphicClick
         m_Mode: 1
         m_Arguments:
@@ -695,7 +695,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1166054557}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 285e5743be7fe0f40b71a4131b59645f, type: 3}
+  m_Script: {fileID: 11500000, guid: 9058e482134609e468bf3baed33821ba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1882365852
