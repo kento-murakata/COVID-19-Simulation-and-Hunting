@@ -168,11 +168,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   stageObj: {fileID: 82380577705194140, guid: c6782fd84b080334697a018adb5c9a33, type: 3}
-  directionColor: {r: 0, g: 0, b: 1, a: 1}
+  initHealthStatus: 0
   moveDuration: 5
-  collisionHoldingTime: 1
-  userHealthPoint: 100
+  moveVelocity: 3.5
   detectRadius: 0.5
+  faceMaskEffect: 2
+  collisionHoldingTime: 1
+  healthPoint: 100
+  directionColor: {r: 0, g: 0, b: 1, a: 1}
+  currentStatus: 0
 --- !u!1 &7227841191415123339
 GameObject:
   m_ObjectHideFlags: 0
@@ -191,7 +195,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &7227841191415123338
 Transform:
   m_ObjectHideFlags: 0

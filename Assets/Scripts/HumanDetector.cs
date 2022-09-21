@@ -54,7 +54,7 @@ public class HumanDetector : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Human"))
+        if (other.CompareTag("Human") && humanObj != other.gameObject)
         {
             if (!contactHumans.Contains(other.gameObject))
             {
