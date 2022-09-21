@@ -6,59 +6,54 @@ using System.Linq;
 
 namespace InfectionSimulator
 {
-    public class DataBase : MonoBehaviour
+    public class infectedDataBase : MonoBehaviour
     {
-        public enum month
+        private void Awake()
         {
-            Jan,
-            Feb,
-            Mar,
-            Apr,
-            May,
-            Jun,
-            Jul,
-            Aug,
-            Sep,
-            Oct,
-            Nov,
-            Dec,
+            MonthlyNewInfector();
         }
-
-        public void MonthlyNewInfector()
+        private void MonthlyNewInfector()
         {
-            float newInfector = 1000; // The number of new patiants. Get form Infected.cs ?
-            float infectionCountTimer = Infection.beInfectionNegativeTime; //田場さんから感染タイミングのもらう                    
             //感染者リストをもらう。
-            float patiantsList = 100;
+            //Find でゲームオブジェクトの人を探す。　人に結びついてる時間を拾う。
+            //int result =list.Find(infected => infected.Infected == "beInfectionNegativeTime==true");
+            //int result =list.Find(infected => infected.Infected == "beInfectionNegativeTime==true").humanId;
+            //int result =list.Find(infected => infected.Infected == "beInfectionNegativeTime==true").Vector2;
 
-            float spendTime = Time.time;
-            float monthlyTime = 100;
 
-            float janEndTime = monthlyTime;
-            float febEndTime = janEndTime + monthlyTime;
-            float marEndTime = febEndTime + monthlyTime;
-            float aprEndTime = marEndTime + monthlyTime;
-            float mayEndTime = aprEndTime + monthlyTime;
-            float junEndTime = mayEndTime + monthlyTime;
-            float julEndTime = junEndTime + monthlyTime;
-            float augEndTime = julEndTime + monthlyTime;
-            float sepEndTime = augEndTime + monthlyTime;
-            float octEndTime = sepEndTime + monthlyTime;
-            float novEndTime = octEndTime + monthlyTime;
-            float decEndTime = novEndTime + monthlyTime;
+            private float newInfector = 1000f; // The number of new patiants. Get form Infected.cs 
+            private float infectionCountTimer = Infection.beInfectionNegativeTime; //田場さんから感染タイミングのもらう     
 
-            float newInfectorOfJan = 0;
-            float newInfectorOfFeb = 0;
-            float newInfectorOfMar = 0;
-            float newInfectorOfApr = 0;
-            float newInfectorOfMay = 0;
-            float newInfectorOfJun = 0;
-            float newInfectorOfJul = 0;
-            float newInfectorOfAug = 0;
-            float newInfectorOfSep = 0;
-            float newInfectorOfOct = 0;
-            float newInfectorOfNov = 0;
-            float newInfectorOfDec = 0;
+            private float patiantsList = 100.0f;
+
+            private float spendTime = Time.time;
+            private float monthlyTime = 100.0f;
+
+            private float janEndTime = monthlyTime;
+            private float febEndTime = janEndTime + monthlyTime;
+            private float marEndTime = febEndTime + monthlyTime;
+            private float aprEndTime = marEndTime + monthlyTime;
+            private float mayEndTime = aprEndTime + monthlyTime;
+            private float junEndTime = mayEndTime + monthlyTime;
+            private float julEndTime = junEndTime + monthlyTime;
+            private float augEndTime = julEndTime + monthlyTime;
+            private float sepEndTime = augEndTime + monthlyTime;
+            private float octEndTime = sepEndTime + monthlyTime;
+            private float novEndTime = octEndTime + monthlyTime;
+            private float decEndTime = novEndTime + monthlyTime;
+
+            private float newInfectorOfJan = 0f;
+            private float newInfectorOfFeb = 0f;
+            private float newInfectorOfMar = 0f;
+            private float newInfectorOfApr = 0f;
+            private float newInfectorOfMay = 0f;
+            private float newInfectorOfJun = 0f;
+            private float newInfectorOfJul = 0f;
+            private float newInfectorOfAug = 0f;
+            private float newInfectorOfSep = 0f;
+            private float newInfectorOfOct = 0f;
+            private float newInfectorOfNov = 0f;
+            private float newInfectorOfDec = 0f;
 
             for (int i = 0; i <= patiantsList; i++)
             {
