@@ -1,5 +1,8 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -13,30 +16,54 @@ public enum HealthStatus
 
 public class HumanBehaviour : MonoBehaviour
 {
-    //TODO move stageObj to GameManager
+    //TODO GameManagerから取得するように変更予定
     [SerializeField]
-    private GameObject stageObj;
+    private GameObject stageObj; //インスタンス生成座標特定用
 
     [SerializeField]
-    private Color directionColor = Color.blue;
+    private HealthStatus initHealthStatus = HealthStatus.negative;
 
     [SerializeField]
-    private float moveDuration = 5.0f;
+    private HealthStatus currentStatus;
+
+    private HealthStatus preStatus;
+
+    //TODO GameManagerから取得するように変更予定
+    [SerializeField]
+    private float moveDuration = 5.0f; //最大移動距離 (行動制限有無)
+
+    //TODO GameManagerから取得するように変更予定
+    [SerializeField]
+    private float moveVelocity = 3.5f;
+
+    //TODO GameManagerから取得するように変更予定
+    [SerializeField]
+    private float detectRadius = 0.5f; //他人との接触判定距離
 
     [SerializeField]
-    private float collisionHoldingTime = 1.0f;
+    private float faceMaskEffect = 2.0f; //マスク有の時の接触判定距離縮小効果
+
+    //TODO GameManagerから取得するように変更予定
+    [SerializeField]
+    private float collisionHoldingTime = 3.0f; //人同士の衝突保持時間
+
+    //TODO GameManagerから取得するように変更予定
+    [SerializeField]
+    private float healthPoint = 100; //HP
 
     [SerializeField]
-    private float userHealthPoint = 100;
+    private Color directionColor = Color.blue; //進路可視化(デバッグ用)
 
-    [SerializeField]
-    private float detectRadius = 0.5f;
+    public bool IsFaceMask { get; set; } //マスク有無
 
-    private Rigidbody rBody;
+    public bool IsBehaviouralRestriction { get; set; } //行動制限有無
+
+    private GameManager gameManager;
     private NavMeshAgent m_navMesh;
     private HumanDetector m_detector;
+    private Rigidbody m_rBody;
     private Renderer m_bodyRenderer;
-    private HealthStatus preStatus;
+    private Infection infection;
 
     private float maxPositionX;
     private float minPositionX;
@@ -45,52 +72,57 @@ public class HumanBehaviour : MonoBehaviour
 
     public HealthStatus healthStatus
     {
-        get
-        {
-            Infection infection = new Infection();
-            HumanDetector detector = new HumanDetector();
+        get { return currentStatus; }
+    }
 
-            return infection.Test(this, detector.ContactHumans);
-        }
+    public float HealthPoint
+    {
+        get { return healthPoint; }
     }
 
     private void Awake()
     {
-        SettingNavMeshAgent();
-        SettingHumanDetector();
+        gameManager = GetComponent<GameManager>();
 
-        rBody = gameObject.AddComponent<Rigidbody>();
-        rBody.isKinematic = true;
+        SettingHumanObject();
+        SettingHumanDetector();
+        SettingInfectionComponent();
     }
 
     private void Start()
     {
-        DeployObject();
+        //TODO gameManagerで実装後、削除予定
+        DeployObject(RandomPosition());        
+        ChangeHealthStatus(initHealthStatus);
     }
 
     private void Update()
     {
         SetDestination();
-
-        //Debug.Log(healthStatus);
-
-        //ChangeBodyColor(healthStatus);
+        CheckHealthStatus();
+        ChangeBodyColor();
     }
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.transform.CompareTag("Human"))
         {
-            m_navMesh.ResetPath();
+            ChangeDestination();
         }
     }
 
-    // TODO setting NavMeshAgent
-    private void SettingNavMeshAgent()
+    private void SettingHumanObject()
     {
-        // add NavMeshAgent Component
+        // add NavMeshAgent Component for object movement
         m_navMesh = gameObject.AddComponent<NavMeshAgent>();
         m_navMesh.speed = 1.0f;
+
+        // add Rigidbody Component for collision detection
+        m_rBody = gameObject.AddComponent<Rigidbody>();
+        m_rBody.isKinematic = true;
+
+        // set initial health status
+        currentStatus = initHealthStatus;
     }
 
     private void SettingHumanDetector()
@@ -99,7 +131,17 @@ public class HumanBehaviour : MonoBehaviour
         m_detector.DetectRadius = detectRadius;
     }
 
-    private void DeployObject()
+    private void SettingInfectionComponent()
+    {
+        infection = gameObject.GetComponent<Infection>();
+    }
+
+    private void DeployObject(Vector3 generatePosition)
+    {
+        transform.position = generatePosition;
+    }
+
+    private Vector3 RandomPosition()
     {
         // spawn range
         maxPositionX = stageObj.transform.position.x + stageObj.transform.lossyScale.x * 5;
@@ -107,21 +149,20 @@ public class HumanBehaviour : MonoBehaviour
         maxPositionZ = stageObj.transform.position.z + stageObj.transform.lossyScale.z * 5;
         minPositionZ = stageObj.transform.position.z - stageObj.transform.lossyScale.z * 5;
 
-        // spawn object to target position
-        var randomPosition = new Vector3(
+        return new Vector3(
            Random.Range(minPositionX, maxPositionX),
            transform.localScale.y,
            Random.Range(minPositionZ, maxPositionZ));
-
-        transform.position = randomPosition;
     }
 
     private void SetDestination()
     {
         if (m_navMesh != null)
         {
-            if (!m_navMesh.hasPath)
+            if (m_navMesh.remainingDistance < 0.1f)
             {
+                StartCoroutine(Wait(collisionHoldingTime));
+
                 float moveDurationX = Random.Range(-moveDuration, moveDuration);
                 float moveDurationZ = Random.Range(-moveDuration, moveDuration);
 
@@ -130,40 +171,66 @@ public class HumanBehaviour : MonoBehaviour
                    transform.position.y,
                    transform.position.z + moveDurationZ);
 
-                m_navMesh.isStopped = false;
                 m_navMesh.SetDestination(targetPosition);
             }
         }
     }
 
-    private void ChangeBodyColor(HealthStatus status)
+    //人同士の衝突時に進路変更を実施
+    private void ChangeDestination()
     {
-        if(preStatus != status)
+        m_navMesh.ResetPath();
+    }
+
+    private void CheckHealthStatus()
+    {
+        if(m_detector.ContactHumans.Count > 0)
         {
-            m_bodyRenderer = GetComponent<Renderer>();
-
-            switch (status)
-            {
-                case HealthStatus.infectionNegative:
-                    m_bodyRenderer.material.color = Color.magenta;
-                    break;
-                case HealthStatus.infectionPositive:
-                    m_bodyRenderer.material.color = Color.magenta;
-                    break;
-                case HealthStatus.onsetAndQuarantine:
-                    m_bodyRenderer.material.color = Color.magenta;
-                    break;
-                default:
-                    break;
-            }
-
-            preStatus = status;
+            currentStatus = infection.Test(this, m_detector.ContactHumans);
+            Debug.Log("currentStatus: " + currentStatus);
         }
     }
 
-    IEnumerator Wait()
+    public void ChangeHealthStatus(HealthStatus status)
     {
-        yield return new WaitForSeconds(2.0f);
+        currentStatus = status;
+    }
+
+    private void ChangeBodyColor()
+    {
+        if (preStatus != currentStatus)
+        {
+            m_bodyRenderer = GetComponent<Renderer>();
+
+            switch (currentStatus)
+            {
+                case HealthStatus.infectionNegative:
+                    m_bodyRenderer.material.color = Color.magenta;
+                    //m_bodyRenderer.material.color = gameManager.stage2Color;
+                    break;
+                case HealthStatus.infectionPositive:
+                    m_bodyRenderer.material.color = Color.red;
+                    //m_bodyRenderer.material.color = gameManager.stage3Color;
+                    break;
+                case HealthStatus.onsetAndQuarantine:
+                    m_bodyRenderer.material.color = Color.gray;
+                    //m_bodyRenderer.material.color = gameManager.stage4Color;
+                    break;
+                default:
+                    m_bodyRenderer.material.color = Color.cyan;
+                    //m_bodyRenderer.material.color = gameManager.stage1Color;
+                    break;
+            }
+        }
+        preStatus = currentStatus;
+    }
+
+    private IEnumerator Wait(float waitTime)
+    {
+        var preTime = Time.time;
+        yield return new WaitForSeconds(waitTime);
+        var pastTime = Time.time;
+        Debug.Log("WaitTime: " + (pastTime - preTime));
     }
 
 

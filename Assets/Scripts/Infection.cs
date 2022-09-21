@@ -6,56 +6,129 @@ using UnityEngine;
 
 public class Infection : MonoBehaviour
 {
-    private float preContactTime = 0f;
+    #region fields
+
     [SerializeField]
-    private float totalContactTime = 0;
-    private float elapsedTime = 0;
+    private float totalContactTime;
+    [SerializeField]
+    private float ElapsedTimeAfterInfection;
+    [SerializeField]
+    private float toInfectionNegativeTime;
+    [SerializeField]
+    private float toInfectionPositiveTime;
+    [SerializeField]
+    private float toOnsetAndQuarantineTime;
+    [SerializeField]
+    private float toNegativeTime = 20f * Day;
 
-    private float timeInfection;
+    private float preContactTime;
+    private float elapsedTime;
+    private float HealthRecovery = 3.0f;
 
-    private const float HealthRecovery = 3;
-    private const float Minuts = 60;
+    private float time;
 
+    private static readonly float Minuts = 60.0f;
+    private static readonly float Day = 86400.0f;
+
+    private float toInfectionNegativeMinTime = 15f * Minuts;
+    private float toInfectionNegativeMaxTime = 30f * Minuts;
+
+    private float toInfectionPositiveMinTime = 1f * Day;
+    private float toInfectionPositiveMaxTime = 7f * Day;
+
+    private float toOnsetAndQuarantineMinTime = 3f * Day;
+    private float toOnsetAndQuarantineMaxTime = 5f * Day;
 
     HealthStatus healthStatus;
+    GameObject colPositive;
 
+    #endregion fields
+
+    #region properties
+    public float beNegativeTime { get; private set; }
+    public float beInfectionNegativeTime { get; private set; }
+    public float beInfectionPositiveTime { get; private set; }
+    public float beOnsetAndQuarantineTime { get; private set; }
+
+    #endregion properties
+
+#region methods
+
+    private void Awake()
+    {
+        toInfectionNegativeTime = Random.Range(
+                    toInfectionNegativeMinTime,
+                    toInfectionNegativeMaxTime);
+
+        toInfectionPositiveTime = Random.Range(
+                toInfectionPositiveMinTime,
+                toInfectionPositiveMaxTime);
+
+        toOnsetAndQuarantineTime = Random.Range(
+                toOnsetAndQuarantineMinTime,
+                toOnsetAndQuarantineMaxTime);
+    }
 
     //todo getcomponent の複数回呼出しをまとめる
     public HealthStatus Test(HumanBehaviour human, List<GameObject> collider)
     {
+        time = Time.time;
         healthStatus = human.healthStatus;
 
-        if (healthStatus == HealthStatus.onsetAndQuarantine) { return healthStatus; }
-
-        if (collider.Count != 0 && collider[0].CompareTag("Person"))
-        {
-            Debug.Log(collider[0].GetComponent<HumanBehaviour>().healthStatus);
-        }
+        Isnpector();
 
         //getcomponentは重いためfindtagに変更するべき
-        var colPositive = collider.Find(col => (int)col.GetComponent<HumanBehaviour>().healthStatus >= (int)HealthStatus.infectionPositive);
+        colPositive = collider.Find(col => (int)col.GetComponent<HumanBehaviour>().healthStatus >= (int)HealthStatus.infectionPositive);
         totalContactTime = GetTotalContactTime(colPositive);
 
-        if (colPositive == null) { return healthStatus; }
-
-        healthStatus = ToInfectionNegative(totalContactTime);
-
-        if ((int)healthStatus >= (int)HealthStatus.infectionNegative)
+        if (healthStatus == HealthStatus.negative)
         {
-            StartCoroutine(ToInfectionPositive());
-
-            healthStatus = HealthStatus.infectionPositive;
-
-            StartCoroutine(ToOnsetAndQuarantine());
-
-            healthStatus = HealthStatus.onsetAndQuarantine;
+            if(totalContactTime > toInfectionNegativeTime)
+            {
+                healthStatus = HealthStatus.infectionNegative;
+                beInfectionNegativeTime = time;
+            }
+        }
+        else if (healthStatus == HealthStatus.infectionNegative)
+        {
+            if(time - beInfectionNegativeTime >= toInfectionPositiveTime)
+            {
+                healthStatus = HealthStatus.infectionPositive;
+                beInfectionPositiveTime = time;
+            }
+        }
+        else if (healthStatus == HealthStatus.infectionPositive)
+        {
+            if (time - beInfectionPositiveTime >= toOnsetAndQuarantineTime)
+            {
+                healthStatus = HealthStatus.onsetAndQuarantine;
+                beOnsetAndQuarantineTime = time;
+            }
+        }
+        else if (healthStatus == HealthStatus.onsetAndQuarantine)
+        {
+            if (time - beOnsetAndQuarantineTime >= toNegativeTime)
+            {
+                healthStatus = HealthStatus.negative;
+                beNegativeTime = time;
+                totalContactTime = 0;
+                ElapsedTimeAfterInfection = 0;
+            }
         }
         return healthStatus;
     }
 
+    private void Isnpector()
+    {
+        if ((int)healthStatus >= (int)HealthStatus.infectionNegative)
+        {
+            ElapsedTimeAfterInfection = time - beInfectionNegativeTime;
+        }
+    }
+
     private float GetTotalContactTime(GameObject colPositive)
     {
-        elapsedTime = Time.time - preContactTime;
+        elapsedTime = time - preContactTime;
         //接触していなかった時間分HPを回復させる
         if (colPositive != null)
         {
@@ -67,27 +140,8 @@ public class Infection : MonoBehaviour
             totalContactTime -= elapsedTime * HealthRecovery;
             totalContactTime = totalContactTime < 0f ? 0f : totalContactTime;
         }
-        preContactTime = Time.time;
+        preContactTime = time;
         return totalContactTime;
     }
-
-    private HealthStatus ToInfectionNegative(float totalContactTime)
-    {
-        //todo感染アルゴリズム
-        timeInfection = 15 * Minuts; //15分に暫定設定
-
-        return timeInfection < totalContactTime ? HealthStatus.infectionNegative : HealthStatus.negative;
-    }
-
-    IEnumerator ToInfectionPositive()
-    {
-        float waitTime = 3;
-        yield return new WaitForSeconds(waitTime);
-    }
-
-    IEnumerator ToOnsetAndQuarantine()
-    {
-        float waitTime = 3;
-        yield return new WaitForSeconds(waitTime);
-    }
 }
+#endregion methods
