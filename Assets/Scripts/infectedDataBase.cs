@@ -2,153 +2,130 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using System;
 
-
-namespace InfectionSimulator
+public class infectedDataBase : MonoBehaviour
 {
-    public class infectedDataBase : MonoBehaviour
+
+    #region Fields
+
+    //Declare the each end time
+    private float janEndTime;
+    private float febEndTime;
+    private float marEndTime;
+    private float aprEndTime;
+    private float mayEndTime;
+    private float junEndTime;
+    private float julEndTime;
+    private float augEndTime;
+    private float sepEndTime;
+    private float octEndTime;
+    private float novEndTime;
+    private float decEndTime;
+
+    //Declare the number of new patients of each month
+    private float newInfectorOfJan;
+    private float newInfectorOfFeb;
+    private float newInfectorOfMar;
+    private float newInfectorOfApr;
+    private float newInfectorOfMay;
+    private float newInfectorOfJun;
+    private float newInfectorOfJul;
+    private float newInfectorOfAug;
+    private float newInfectorOfSep;
+    private float newInfectorOfOct;
+    private float newInfectorOfNov;
+    private float newInfectorOfDec;
+
+    //Declare the dictionaluy has the number of new patients of each month
+    private Dictionary<string, float> inspectionNumDictionary;
+
+    //
+    private float dayTime = 3600 * 24f; // GameManager.dayTime; Need to replace the valiable Kawasaki-san made.
+    private float infectionCountTimer; // Infection.beInfectionNegativeTime Need to use the valiable form Taba-san
+
+
+    #endregion
+
+
+    #region Constructor
+    public infectedDataBase()
     {
-        private void Awake()
+        inspectionNumDictionary = new Dictionary<string, float>();
+        inspectionNumDictionary.Add("January", 0);
+        inspectionNumDictionary.Add("February", 0);
+        inspectionNumDictionary.Add("March", 0);
+        inspectionNumDictionary.Add("April", 0);
+        inspectionNumDictionary.Add("May", 0);
+        inspectionNumDictionary.Add("June", 0);
+        inspectionNumDictionary.Add("July", 0);
+        inspectionNumDictionary.Add("August", 0);
+        inspectionNumDictionary.Add("September", 0);
+        inspectionNumDictionary.Add("Octorber", 0);
+        inspectionNumDictionary.Add("Novenmber", 0);
+        inspectionNumDictionary.Add("December", 0);
+    }
+    //Initialization the dictionary
+
+
+    #endregion
+
+
+    #region Properties
+    public Dictionary<string, float> InspectionNumDictionary
+    {
+        get { return inspectionNumDictionary; }
+    }
+    #endregion
+
+    #region Methods
+
+    private void MonthSetting()
+    {
+        janEndTime = dayTime * DateTime.DaysInMonth(2021, 1);
+        febEndTime = janEndTime + dayTime * DateTime.DaysInMonth(2021, 2);
+        marEndTime = febEndTime + dayTime * DateTime.DaysInMonth(2021, 3);
+        aprEndTime = marEndTime + dayTime * DateTime.DaysInMonth(2021, 4);
+        mayEndTime = aprEndTime + dayTime * DateTime.DaysInMonth(2021, 5);
+        junEndTime = mayEndTime + dayTime * DateTime.DaysInMonth(2021, 6);
+        julEndTime = junEndTime + dayTime * DateTime.DaysInMonth(2021, 7);
+        augEndTime = julEndTime + dayTime * DateTime.DaysInMonth(2021, 8);
+        sepEndTime = augEndTime + dayTime * DateTime.DaysInMonth(2021, 9);
+        octEndTime = sepEndTime + dayTime * DateTime.DaysInMonth(2021, 10);
+        novEndTime = octEndTime + dayTime * DateTime.DaysInMonth(2021, 11);
+        decEndTime = novEndTime + dayTime * DateTime.DaysInMonth(2021, 12);
+    }
+
+    private GameObject[]  SearchHuman()
+    {
+        GameObject[] humanArr = GameObject.FindGameObjectsWithTag("Human");
+
+        return humanArr;
+    }
+    public void MonthlyNewInfector(GameObject[] humanArr)
+    {
+        for (int i = 0; i <= humanArr.Length; i++)
         {
-            MonthlyNewInfector();
-        }
-        private void MonthlyNewInfector()
-        {
-            //感染者リストをもらう。
-            //Find でゲームオブジェクトの人を探す。　人に結びついてる時間を拾う。
-            //int result =list.Find(infected => infected.Infected == "beInfectionNegativeTime==true");
-            //int result =list.Find(infected => infected.Infected == "beInfectionNegativeTime==true").humanId;
-            //int result =list.Find(infected => infected.Infected == "beInfectionNegativeTime==true").Vector2;
-
-
-            private float newInfector = 1000f; // The number of new patiants. Get form Infected.cs 
-            private float infectionCountTimer = Infection.beInfectionNegativeTime; //田場さんから感染タイミングのもらう     
-
-            private float patiantsList = 100.0f;
-
-            private float spendTime = Time.time;
-            private float monthlyTime = 100.0f;
-
-            private float janEndTime = monthlyTime;
-            private float febEndTime = janEndTime + monthlyTime;
-            private float marEndTime = febEndTime + monthlyTime;
-            private float aprEndTime = marEndTime + monthlyTime;
-            private float mayEndTime = aprEndTime + monthlyTime;
-            private float junEndTime = mayEndTime + monthlyTime;
-            private float julEndTime = junEndTime + monthlyTime;
-            private float augEndTime = julEndTime + monthlyTime;
-            private float sepEndTime = augEndTime + monthlyTime;
-            private float octEndTime = sepEndTime + monthlyTime;
-            private float novEndTime = octEndTime + monthlyTime;
-            private float decEndTime = novEndTime + monthlyTime;
-
-            private float newInfectorOfJan = 0f;
-            private float newInfectorOfFeb = 0f;
-            private float newInfectorOfMar = 0f;
-            private float newInfectorOfApr = 0f;
-            private float newInfectorOfMay = 0f;
-            private float newInfectorOfJun = 0f;
-            private float newInfectorOfJul = 0f;
-            private float newInfectorOfAug = 0f;
-            private float newInfectorOfSep = 0f;
-            private float newInfectorOfOct = 0f;
-            private float newInfectorOfNov = 0f;
-            private float newInfectorOfDec = 0f;
-
-            for (int i = 0; i <= patiantsList; i++)
-            {
-                if (infectionCountTimer <= janEndTime) { newInfectorOfJan++; }
-                else if (infectionCountTimer <= febEndTime) { newInfectorOfFeb++; }
-                else if (infectionCountTimer <= marEndTime) { newInfectorOfMar++; }
-                else if (infectionCountTimer <= aprEndTime) { newInfectorOfApr++; }
-                else if (infectionCountTimer <= mayEndTime) { newInfectorOfMay++; }
-                else if (infectionCountTimer <= junEndTime) { newInfectorOfJun++; }
-                else if (infectionCountTimer <= julEndTime) { newInfectorOfJul++; }
-                else if (infectionCountTimer <= augEndTime) { newInfectorOfAug++; }
-                else if (infectionCountTimer <= sepEndTime) { newInfectorOfSep++; }
-                else if (infectionCountTimer <= octEndTime) { newInfectorOfOct++; }
-                else if (infectionCountTimer <= novEndTime) { newInfectorOfNov++; }
-                else if (infectionCountTimer <= decEndTime) { newInfectorOfDec++; }
-            }
-
-
-            List<float> monthlyInfector = new List<float>();
-            monthlyInfector.Add(newInfectorOfJan);
-            monthlyInfector.Add(newInfectorOfFeb);
-            monthlyInfector.Add(newInfectorOfMar);
-            monthlyInfector.Add(newInfectorOfApr);
-            monthlyInfector.Add(newInfectorOfMay);
-            monthlyInfector.Add(newInfectorOfJun);
-            monthlyInfector.Add(newInfectorOfJul);
-            monthlyInfector.Add(newInfectorOfAug);
-            monthlyInfector.Add(newInfectorOfSep);
-            monthlyInfector.Add(newInfectorOfOct);
-            monthlyInfector.Add(newInfectorOfNov);
-            monthlyInfector.Add(newInfectorOfDec);
+            if (infectionCountTimer <= janEndTime) { newInfectorOfJan++; }
+            else if (infectionCountTimer <= febEndTime) { newInfectorOfFeb++; }
+            else if (infectionCountTimer <= marEndTime) { newInfectorOfMar++; }
+            else if (infectionCountTimer <= aprEndTime) { newInfectorOfApr++; }
+            else if (infectionCountTimer <= mayEndTime) { newInfectorOfMay++; }
+            else if (infectionCountTimer <= junEndTime) { newInfectorOfJun++; }
+            else if (infectionCountTimer <= julEndTime) { newInfectorOfJul++; }
+            else if (infectionCountTimer <= augEndTime) { newInfectorOfAug++; }
+            else if (infectionCountTimer <= sepEndTime) { newInfectorOfSep++; }
+            else if (infectionCountTimer <= octEndTime) { newInfectorOfOct++; }
+            else if (infectionCountTimer <= novEndTime) { newInfectorOfNov++; }
+            else if (infectionCountTimer <= decEndTime) { newInfectorOfDec++; }
         }
     }
+
+    #endregion
 }
 
 
 
 
-//    float oneDay = Time.time / 365; //Time.timeの1日あたりの時間を決める。とりあえず365で割ってみた。
-//    int[] date = new int[364];
-//    List<>= new List<int, float>();
-//        string[] month = new string[11];
-
-//        //date に1-365まで代入する。閏年はなし。
-//        for(int i = 1; i <=364; i++)
-//        {
-//            date[i]= date[i] + 1;
-//        }
-
-//string month =
-
-//        float newInfector;
-//        float currentInfector; // <= From Kawasaki-san,
-//        float totalInfector;
-//        float curedNumber; 
-
-//        // Dictionaly<floatTime,floatStatus, personId> time.Time, status, Id(personID)
 
 
-
-
-//        public void Count()
-//        {
-//            var monthlyInfector = new Dictionary<string, int>();
-
-
-//        }
-
-
-
-//        int dailyInfector = 0;//GameMangerから感染者数持ってきて置き換える。
-//        int timeCounter = 100; //日ごとか月ごとか何かしらの区切り要素？
-//        int dayCount = 0; //〇日目のカウントを持ってくる。
-//        string[] date = new string[] { }; //日付をリストにいれる
-//        int[] infectedNumber = new int[] { };  //感染者数をリストにいれる
-
-//        private void Awake()
-//        {
-//            DailyInfectedNumber();
-//            Dictionary<string, int> correctInfector =
-//                new Dictionary<string, int>(date[], infectedNumber[]);
-//        }
-
-//        public void DailyInfectedNumber()
-//        {
-//            for (int i = 0; i < timeCounter; i++)
-//            {
-//                dayCount = dayCount + 1;
-//                date[i] = $"Day{dayCount}";
-//            }
-
-//            for (int i = 0; i < timeCounter; i++)
-//            {
-//                infectedNumber[i] = dailyInfector;
-//            }
-//        }
-//    }
-//}
