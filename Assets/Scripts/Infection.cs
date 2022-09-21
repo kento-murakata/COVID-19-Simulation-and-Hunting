@@ -18,19 +18,16 @@ public class Infection : MonoBehaviour
     [SerializeField]
     private float toInfectionPositiveTime;
     [SerializeField]
-    private float toOnsetAndQuarantineTime;
+    public float toOnsetAndQuarantineTime;
     [SerializeField]
     private float toNegativeTime = 20f * Day;
 
-
     private float preContactTime;
     private float elapsedTime;
-    private float _beNegativeTime;
-    private float _beInfectionNegativeTime;
-    private float _beInfectionPositiveTime;
-    private float _beOnsetAndQuarantineTime;
-
     private float HealthRecovery = 3.0f;
+
+    private float time;
+
     private static readonly float Minuts = 60.0f;
     private static readonly float Day = 86400.0f;
 
@@ -44,20 +41,21 @@ public class Infection : MonoBehaviour
     private float toOnsetAndQuarantineMaxTime = 5f * Day;
 
     HealthStatus healthStatus;
+    GameObject colPositive;
 
     #endregion fields
 
     #region properties
-    public float beNegativeTime { get=> _beNegativeTime;}
-    public float beInfectionNegativeTime { get=> _beInfectionNegativeTime;}
-    public float beInfectionPositiveTime { get=> _beInfectionPositiveTime;}
-    public float beOnsetAndQuarantineTime { get=> _beOnsetAndQuarantineTime;}
+    public float beNegativeTime { get; private set; }
+    public float beInfectionNegativeTime { get; private set; }
+    public float beInfectionPositiveTime { get; private set; }
+    public float beOnsetAndQuarantineTime { get; private set; }
 
     #endregion properties
 
 #region methods
 
-private void Awake()
+    private void Awake()
     {
         toInfectionNegativeTime = Random.Range(
                     toInfectionNegativeMinTime,
@@ -75,15 +73,13 @@ private void Awake()
     //todo getcomponent の複数回呼出しをまとめる
     public HealthStatus Test(HumanBehaviour human, List<GameObject> collider)
     {
+        time = Time.time;
         healthStatus = human.healthStatus;
 
-        if((int)healthStatus >= (int)HealthStatus.infectionNegative)
-        {
-            ElapsedTimeAfterInfection = Time.time - beInfectionNegativeTime;
-        }
+        Isnpector();
 
         //getcomponentは重いためfindtagに変更するべき
-            var colPositive = collider.Find(col => (int)col.GetComponent<HumanBehaviour>().healthStatus >= (int)HealthStatus.infectionPositive);
+        colPositive = collider.Find(col => (int)col.GetComponent<HumanBehaviour>().healthStatus >= (int)HealthStatus.infectionPositive);
         totalContactTime = GetTotalContactTime(colPositive);
 
         if (healthStatus == HealthStatus.negative)
@@ -91,31 +87,31 @@ private void Awake()
             if(totalContactTime > toInfectionNegativeTime)
             {
                 healthStatus = HealthStatus.infectionNegative;
-                _beInfectionNegativeTime = Time.time;
+                beInfectionNegativeTime = time;
             }
         }
         else if (healthStatus == HealthStatus.infectionNegative)
         {
-            if(Time.time - beInfectionNegativeTime >= toInfectionPositiveTime)
+            if(time - beInfectionNegativeTime >= toInfectionPositiveTime)
             {
                 healthStatus = HealthStatus.infectionPositive;
-                _beInfectionPositiveTime = Time.time;
+                beInfectionPositiveTime = time;
             }
         }
         else if (healthStatus == HealthStatus.infectionPositive)
         {
-            if (Time.time - beInfectionPositiveTime >= toOnsetAndQuarantineTime)
+            if (time - beInfectionPositiveTime >= toOnsetAndQuarantineTime)
             {
                 healthStatus = HealthStatus.onsetAndQuarantine;
-                _beOnsetAndQuarantineTime = Time.time;
+                beOnsetAndQuarantineTime = time;
             }
         }
         else if (healthStatus == HealthStatus.onsetAndQuarantine)
         {
-            if (Time.time - beOnsetAndQuarantineTime >= toNegativeTime)
+            if (time - beOnsetAndQuarantineTime >= toNegativeTime)
             {
                 healthStatus = HealthStatus.negative;
-                _beNegativeTime = Time.time;
+                beNegativeTime = time;
                 totalContactTime = 0;
                 ElapsedTimeAfterInfection = 0;
             }
@@ -123,10 +119,17 @@ private void Awake()
         return healthStatus;
     }
 
+    private void Isnpector()
+    {
+        if ((int)healthStatus >= (int)HealthStatus.infectionNegative)
+        {
+            ElapsedTimeAfterInfection = time - beInfectionNegativeTime;
+        }
+    }
 
     private float GetTotalContactTime(GameObject colPositive)
     {
-        elapsedTime = Time.time - preContactTime;
+        elapsedTime = time - preContactTime;
         //接触していなかった時間分HPを回復させる
         if (colPositive != null)
         {
@@ -138,7 +141,7 @@ private void Awake()
             totalContactTime -= elapsedTime * HealthRecovery;
             totalContactTime = totalContactTime < 0f ? 0f : totalContactTime;
         }
-        preContactTime = Time.time;
+        preContactTime = time;
         return totalContactTime;
     }
 }
