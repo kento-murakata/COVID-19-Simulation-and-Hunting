@@ -17,7 +17,7 @@ public class Infection : MonoBehaviour
     [SerializeField]
     private float toInfectionPositiveTime;
     [SerializeField]
-    public float toOnsetAndQuarantineTime;
+    private float toOnsetAndQuarantineTime;
     [SerializeField]
     private float toNegativeTime = 20f * Day;
 
