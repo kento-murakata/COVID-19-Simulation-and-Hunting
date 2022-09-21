@@ -58,6 +58,7 @@ public class HumanBehaviour : MonoBehaviour
 
     public bool IsBehaviouralRestriction { get; set; } //行動制限有無
 
+    private GameManager gameManager;
     private NavMeshAgent m_navMesh;
     private HumanDetector m_detector;
     private Rigidbody m_rBody;
@@ -81,6 +82,8 @@ public class HumanBehaviour : MonoBehaviour
 
     private void Awake()
     {
+        gameManager = GetComponent<GameManager>();
+
         SettingHumanObject();
         SettingHumanDetector();
         SettingInfectionComponent();
@@ -96,7 +99,7 @@ public class HumanBehaviour : MonoBehaviour
     private void Update()
     {
         SetDestination();
-        //CheckHealthStatus();
+        CheckHealthStatus();
         ChangeBodyColor();
     }
 
@@ -130,7 +133,7 @@ public class HumanBehaviour : MonoBehaviour
 
     private void SettingInfectionComponent()
     {
-        infection = gameObject.AddComponent<Infection>();
+        infection = gameObject.GetComponent<Infection>();
     }
 
     private void DeployObject(Vector3 generatePosition)
@@ -181,8 +184,11 @@ public class HumanBehaviour : MonoBehaviour
 
     private void CheckHealthStatus()
     {
-        currentStatus = infection.Test(this, m_detector.ContactHumans);
-        Debug.Log("currentStatus: " + currentStatus);
+        if(m_detector.ContactHumans.Count > 0)
+        {
+            currentStatus = infection.Test(this, m_detector.ContactHumans);
+            Debug.Log("currentStatus: " + currentStatus);
+        }
     }
 
     public void ChangeHealthStatus(HealthStatus status)
@@ -200,15 +206,19 @@ public class HumanBehaviour : MonoBehaviour
             {
                 case HealthStatus.infectionNegative:
                     m_bodyRenderer.material.color = Color.magenta;
+                    //m_bodyRenderer.material.color = gameManager.stage2Color;
                     break;
                 case HealthStatus.infectionPositive:
                     m_bodyRenderer.material.color = Color.red;
+                    //m_bodyRenderer.material.color = gameManager.stage3Color;
                     break;
                 case HealthStatus.onsetAndQuarantine:
                     m_bodyRenderer.material.color = Color.gray;
+                    //m_bodyRenderer.material.color = gameManager.stage4Color;
                     break;
                 default:
                     m_bodyRenderer.material.color = Color.cyan;
+                    //m_bodyRenderer.material.color = gameManager.stage1Color;
                     break;
             }
         }

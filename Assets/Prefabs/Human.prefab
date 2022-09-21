@@ -67,6 +67,7 @@ GameObject:
   - component: {fileID: 7227841190030870086}
   - component: {fileID: 7227841190030870087}
   - component: {fileID: 7227841190030870080}
+  - component: {fileID: 1700850413532853019}
   m_Layer: 0
   m_Name: Human
   m_TagString: Human
@@ -169,6 +170,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   stageObj: {fileID: 82380577705194140, guid: c6782fd84b080334697a018adb5c9a33, type: 3}
   initHealthStatus: 0
+  currentStatus: 0
   moveDuration: 5
   moveVelocity: 3.5
   detectRadius: 0.5
@@ -176,7 +178,24 @@ MonoBehaviour:
   collisionHoldingTime: 1
   healthPoint: 100
   directionColor: {r: 0, g: 0, b: 1, a: 1}
-  currentStatus: 0
+--- !u!114 &1700850413532853019
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7227841190030870081}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db65fbf0efb7df94b977e7ed3bb00bd3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  totalContactTime: 0
+  ElapsedTimeAfterInfection: 0
+  toInfectionNegativeTime: 0
+  toInfectionPositiveTime: 0
+  toOnsetAndQuarantineTime: 0
+  toNegativeTime: 1728000
 --- !u!1 &7227841191415123339
 GameObject:
   m_ObjectHideFlags: 0
