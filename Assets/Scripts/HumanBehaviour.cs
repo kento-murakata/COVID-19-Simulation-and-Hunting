@@ -59,6 +59,7 @@ public class HumanBehaviour : MonoBehaviour
     public bool IsBehaviouralRestriction { get; set; } //行動制限有無
 
     private GameManager gameManager;
+    //private UpdateManager updateManager;
     private NavMeshAgent m_navMesh;
     private HumanDetector m_detector;
     private Rigidbody m_rBody;
@@ -82,21 +83,24 @@ public class HumanBehaviour : MonoBehaviour
 
     private void Awake()
     {
-        gameManager = GetComponent<GameManager>();
+        gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
 
         SettingHumanObject();
         SettingHumanDetector();
         SettingInfectionComponent();
+
+        UpdateManager updateManager = GameObject.Find("UpdateManager").GetComponent<UpdateManager>();
+        updateManager.list.Add(this);
     }
 
     private void Start()
     {
         //TODO gameManagerで実装後、削除予定
-        DeployObject(RandomPosition());        
-        ChangeHealthStatus(initHealthStatus);
+        //DeployObject(RandomPosition());
+        //ChangeHealthStatus(initHealthStatus);
     }
 
-    private void Update()
+    public void UpdateMe()
     {
         SetDestination();
         CheckHealthStatus();
@@ -114,12 +118,10 @@ public class HumanBehaviour : MonoBehaviour
     private void SettingHumanObject()
     {
         // add NavMeshAgent Component for object movement
-        m_navMesh = gameObject.AddComponent<NavMeshAgent>();
-        m_navMesh.speed = 1.0f;
+        m_navMesh = GetComponent<NavMeshAgent>();
 
         // add Rigidbody Component for collision detection
-        m_rBody = gameObject.AddComponent<Rigidbody>();
-        m_rBody.isKinematic = true;
+        m_rBody = GetComponent<Rigidbody>();
 
         // set initial health status
         currentStatus = initHealthStatus;
@@ -184,11 +186,7 @@ public class HumanBehaviour : MonoBehaviour
 
     private void CheckHealthStatus()
     {
-        if(m_detector.ContactHumans.Count > 0)
-        {
-            currentStatus = infection.Test(this, m_detector.ContactHumans);
-            Debug.Log("currentStatus: " + currentStatus);
-        }
+        currentStatus = infection.Test(this, m_detector.ContactHumans);
     }
 
     public void ChangeHealthStatus(HealthStatus status)
