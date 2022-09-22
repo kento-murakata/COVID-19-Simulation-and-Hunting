@@ -46,7 +46,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   amount: 2000
-  ratioOfHealth: 1
+  ratioOfHealth: 0.9
   simTime: 10000
   prefabs: {fileID: 7227841190030870081, guid: 1f4464294cbdd684ea6e1e437754115d, type: 3}
   stage1Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
@@ -2368,6 +2368,7 @@ GameObject:
   - component: {fileID: 930068622045325217}
   - component: {fileID: 930068622045325216}
   - component: {fileID: 2573466256814562303}
+  - component: {fileID: 1107102861}
   m_Layer: 5
   m_Name: Exit
   m_TagString: Untagged
@@ -2490,6 +2491,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 1107102861}
+        m_TargetAssemblyTypeName: Graph, Assembly-CSharp
+        m_MethodName: MakeGraph
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &2573466256814562303
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2502,6 +2515,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9058e482134609e468bf3baed33821ba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1107102861
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 930068622045325218}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 57c12b0b0687d6c48b90195432003fab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  view: {fileID: 0}
+  verticalCount: 10
+  horizontalOffsetYAxis: 90
+  verticalOffsetYAxis: 20
+  horizontalOffsetXAxis: 0
+  verticalOffsetXAxis: 0
 --- !u!1 &930068622106818780
 GameObject:
   m_ObjectHideFlags: 0
