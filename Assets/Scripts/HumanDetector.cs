@@ -7,27 +7,24 @@ public class HumanDetector : MonoBehaviour
     [SerializeField]
     private Color directionColor = Color.red;
 
-    private new Rigidbody rigidbody;
-    private new SphereCollider collider;
-    private float detectRadius = 0.5f;
-
     //TODO change from List to Array
     private List<GameObject> contactHumans = new List<GameObject>();
 
     private GameObject humanObj;
+    private new SphereCollider collider;
 
     public float DetectRadius
     {
-        get { return detectRadius; }
+        get { return collider.radius; }
         set
         {
             if (value > 0)
             {
-                detectRadius = value;
+                collider.radius = value;
             }
             else
             {
-                detectRadius = 0;
+                collider.radius = 0;
             }
         }
     }
@@ -39,9 +36,7 @@ public class HumanDetector : MonoBehaviour
 
     private void Awake()
     {
-        rigidbody = GetComponent<Rigidbody>();
         collider = GetComponent<SphereCollider>();
-        collider.radius = detectRadius;
     }
 
     private void Start()
