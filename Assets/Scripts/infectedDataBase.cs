@@ -23,6 +23,11 @@ public class infectedDataBase : MonoBehaviour
     private float novEndTime;
     private float decEndTime;
 
+
+    //
+    private float dayTime = (1 / 86400); // GameManager.adjTimescale; Need to replace the valiable Kawasaki-san made.
+
+
     //Declare the number of new patients of each month
     private float newInfectorOfJan;
     private float newInfectorOfFeb;
@@ -40,12 +45,12 @@ public class infectedDataBase : MonoBehaviour
     //Declare the dictionaluy has the number of new patients of each month
     private Dictionary<string, float> infectionNumDictionary;
 
-    //
-    private float dayTime = 0.1f;// GameManager.dayTime; Need to replace the valiable Kawasaki-san made.
 
 
 
     #endregion
+
+   
 
 
     #region Constructor
@@ -97,6 +102,8 @@ public class infectedDataBase : MonoBehaviour
         novEndTime = octEndTime + dayTime * DateTime.DaysInMonth(2021, 11);
         decEndTime = novEndTime + dayTime * DateTime.DaysInMonth(2021, 12);
     }
+
+  
     
 
     public void MonthlyNewInfector(GameObject[] humanArr)
