@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6580091989359393732}
-  - component: {fileID: 3870286855236663699}
+  - component: {fileID: 4755299293194935965}
   m_Layer: 0
   m_Name: InfectionParamsChenger
   m_TagString: Untagged
@@ -32,7 +32,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3870286855236663699
+--- !u!114 &4755299293194935965
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -41,7 +41,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 9173647223922057953}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a69185c57e42cd144903adf34f59c258, type: 3}
+  m_Script: {fileID: 11500000, guid: c0f763369c9a9974e889710e860c426a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _log: 
+  toInfectionNegativeTime: 0
+  toInfectionPositiveTime: 0
+  toOnsetAndQuarantineTime: 0
+  toNegativeTime: 0
