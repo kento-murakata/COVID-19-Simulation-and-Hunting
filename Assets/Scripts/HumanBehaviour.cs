@@ -228,22 +228,22 @@ public class HumanBehaviour : MonoBehaviour
         var preTime = Time.time;
         yield return new WaitForSeconds(waitTime);
         var pastTime = Time.time;
-        Debug.Log("WaitTime: " + (pastTime - preTime));
+        //Debug.Log("WaitTime: " + (pastTime - preTime));
     }
 
 
-    private void OnDrawGizmos()
-    {
-        if (m_navMesh && m_navMesh.enabled)
-        {
-            Gizmos.color = directionColor;
-            var prePos = transform.position;
-            prePos.y = 0;
-            foreach (var pos in m_navMesh.path.corners)
-            {
-                Gizmos.DrawLine(prePos, pos);
-                prePos = pos;
-            }
-        }
-    }
+    //private void OnDrawGizmos()
+    //{
+    //    if (m_navMesh && m_navMesh.enabled)
+    //    {
+    //        Gizmos.color = directionColor;
+    //        var prePos = transform.position;
+    //        prePos.y = 0;
+    //        foreach (var pos in m_navMesh.path.corners)
+    //        {
+    //            Gizmos.DrawLine(prePos, pos);
+    //            prePos = pos;
+    //        }
+    //    }
+    //}
 }

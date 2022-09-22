@@ -71,15 +71,15 @@ public class HumanDetector : MonoBehaviour
         }
     }
 
-    private void OnDrawGizmos()
-    {
-        Gizmos.color = directionColor;
-        foreach (var pos in contactHumans)
-        {
-            var currentPos = humanObj.transform.position;
-            var targetPos = pos.transform.position;
+    //private void OnDrawGizmos()
+    //{
+    //    Gizmos.color = directionColor;
+    //    foreach (var pos in contactHumans)
+    //    {
+    //        var currentPos = humanObj.transform.position;
+    //        var targetPos = pos.transform.position;
 
-            Gizmos.DrawLine(currentPos, targetPos);
-        }
-    }
+    //        Gizmos.DrawLine(currentPos, targetPos);
+    //    }
+    //}
 }
