@@ -9,17 +9,19 @@ public class Infection : MonoBehaviour
     #region fields
 
     [SerializeField]
-    private float totalContactTime;
+    public  float totalContactTime;
     [SerializeField]
-    private float ElapsedTimeAfterInfection;
+    public float ElapsedTimeAfterInfection;
     [SerializeField]
-    private float toInfectionNegativeTime;
+    public float toInfectionNegativeTime;
     [SerializeField]
-    private float toInfectionPositiveTime;
+    public float toInfectionPositiveTime;
     [SerializeField]
-    private float toOnsetAndQuarantineTime;
+    public float toOnsetAndQuarantineTime;
     [SerializeField]
-    private float toNegativeTime = 20f * Day;
+    public float toNegativeTime = 20f * Day;
+
+
 
     private float preContactTime;
     private float elapsedTime;
