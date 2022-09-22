@@ -8,7 +8,7 @@ public class ButtonManager : MonoBehaviour
     //Creat ScenceChange Button
     public void onScenceChangeClick()
     {
-        SceneManager.LoadScene("Graphic");
+        //SceneManager.LoadScene("Graphic");
     }
 
     //Creat dataoutput Button
@@ -40,4 +40,6 @@ public class ButtonManager : MonoBehaviour
     {
         Debug.Log("Graphic Out!!");
     }
+
+    
 }
