@@ -42,6 +42,8 @@ public class GameManager:MonoBehaviour
     public Text textForPercentage;
     public Text totalTime;
 
+    public List<GameObject> PersonList { get { return personList; } }
+
     /////////////////////////////////////////////////////////////////////////////////////////////
 
     private void Start()

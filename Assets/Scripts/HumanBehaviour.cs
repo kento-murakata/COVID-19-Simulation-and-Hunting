@@ -19,17 +19,55 @@ public class HumanBehaviour : MonoBehaviour
     [SerializeField]
     private Color directionColor = Color.blue; //進路可視化(デバッグ用)
 
-    [SerializeField]
-    private HealthStatus initHealthStatus = HealthStatus.negative;
+    //マスク有無
+    public bool IsFaceMask
+    {
+        get
+        {
+            return isFaceMask;
+        }
+        set
+        {
+            if (isFaceMask != value)
+            {
+                isFaceMask = value;
 
-    [SerializeField]
-    private HealthStatus currentStatus;
+                if (isFaceMask)
+                {
+                    SetDetectRadius(detectRadius / faceMaskEffect);
+                }
+                else
+                {
+                    SetDetectRadius(detectRadius);
+                }
+            }
+        }
+    }
 
-    private HealthStatus preStatus;
+    //行動制限有無
+    public bool IsBehaviouralRestriction
+    {
+        get
+        {
+            return isBehaviouralRestriction;
+        }
+        set
+        {
+            if (isBehaviouralRestriction != value)
+            {
+                isBehaviouralRestriction = value;
 
-    public bool IsFaceMask { get; set; } //マスク有無
-
-    public bool IsBehaviouralRestriction { get; set; } //行動制限有無
+                if (isBehaviouralRestriction)
+                {
+                    moveDuration /= BehaviouralRestrictionEffect; 
+                }
+                else
+                {
+                    moveDuration *= BehaviouralRestrictionEffect;
+                }
+            }
+        }
+    }
 
     public HealthStatus healthStatus
     {
@@ -47,13 +85,20 @@ public class HumanBehaviour : MonoBehaviour
     private Material m_bodyMaterial;
     private Infection infection;
 
+    private HealthStatus currentStatus;
+    private HealthStatus preStatus;
+
+    private bool isFaceMask = false; //マスク有無のフラグ
+    private bool isBehaviouralRestriction = false; //行動制限のフラグ
+
+    private float faceMaskEffect = 2.0f; //マスク有の時の接触判定距離縮小効果
+    private float BehaviouralRestrictionEffect = 2.0f; //行動制限時の最大移動距離縮小効果
+
     private float moveDuration = 5.0f; //最大移動距離 (行動制限有無)
     private float detectRadius = 0.5f; //他人との接触判定距離
-    private float moveVelocity = 3.5f;
-    private float collisionHoldingTime = 3.0f; //人同士の衝突保持時間
+    private float moveVelocity = 3.5f; //移動速度
     private float healthPoint = 100; //HP
-    private float faceMaskEffect = 2.0f; //マスク有の時の接触判定距離縮小効果
-    
+
     private void Awake()
     {
         GetComponents();
@@ -65,6 +110,9 @@ public class HumanBehaviour : MonoBehaviour
     private void Start()
     {
         SetDetectRadius(detectRadius);
+
+        // set body color to default color
+        m_bodyMaterial.color = gameManager.stage1Color;
     }
 
     public void UpdateMe()
@@ -86,8 +134,8 @@ public class HumanBehaviour : MonoBehaviour
     {
         // add GameManager Component
         gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
-        moveDuration = gameManager.moveDuration;
         detectRadius = gameManager.detectRadius;
+        moveDuration = gameManager.moveDuration;
 
         // add NavMeshAgent Component for object movement
         m_navMesh = GetComponent<NavMeshAgent>();
@@ -107,8 +155,6 @@ public class HumanBehaviour : MonoBehaviour
         {
             if (m_navMesh.remainingDistance < 0.1f)
             {
-                StartCoroutine(Wait(collisionHoldingTime));
-
                 float moveDurationX = Random.Range(-moveDuration, moveDuration);
                 float moveDurationZ = Random.Range(-moveDuration, moveDuration);
 
@@ -131,15 +177,6 @@ public class HumanBehaviour : MonoBehaviour
     private void CheckHealthStatus()
     {
         currentStatus = infection.Test(this, m_detector.ContactHumans);
-    }
-
-    public void ChangeHealthStatus(HealthStatus status)
-    {
-        currentStatus = status;
-    }
-    public void SetDetectRadius(float radius)
-    {
-        m_detector.DetectRadius = radius;
     }
 
     private void ChangeBodyColor()
@@ -165,12 +202,13 @@ public class HumanBehaviour : MonoBehaviour
         preStatus = currentStatus;
     }
 
-    private IEnumerator Wait(float waitTime)
+    public void ChangeHealthStatus(HealthStatus status)
     {
-        var preTime = Time.time;
-        yield return new WaitForSeconds(waitTime);
-        var pastTime = Time.time;
-        //Debug.Log("WaitTime: " + (pastTime - preTime));
+        currentStatus = status;
+    }
+    public void SetDetectRadius(float radius)
+    {
+        m_detector.DetectRadius = radius;
     }
 
     //private void OnDrawGizmos()
