@@ -4,69 +4,52 @@ using UnityEngine;
 using System.Linq;
 using System;
 
-public class infectedDataBase : MonoBehaviour
+public static class infectedDataBase
 {
-
     #region Fields
 
     //Declare the each end time
-    private float janEndTime;
-    private float febEndTime;
-    private float marEndTime;
-    private float aprEndTime;
-    private float mayEndTime;
-    private float junEndTime;
-    private float julEndTime;
-    private float augEndTime;
-    private float sepEndTime;
-    private float octEndTime;
-    private float novEndTime;
-    private float decEndTime;
+    private static float janEndTime;
+    private static float febEndTime;
+    private static float marEndTime;
+    private static float aprEndTime;
+    private static float mayEndTime;
+    private static float junEndTime;
+    private static float julEndTime;
+    private static float augEndTime;
+    private static float sepEndTime;
+    private static float octEndTime;
+    private static float novEndTime;
+    private static float decEndTime;
 
     //
-    private float dayTime = (1 / 86400); // GameManager.adjTimescale; Need to replace the valiable Kawasaki-san made.
+    private static float dayTime = 1.0f; // GameManager.adjTimescale; Need to replace the valiable Kawasaki-san made.
 
     //Declare the number of new patients of each month
-    private float newInfectorOfJan;
-    private float newInfectorOfFeb;
-    private float newInfectorOfMar;
-    private float newInfectorOfApr;
-    private float newInfectorOfMay;
-    private float newInfectorOfJun;
-    private float newInfectorOfJul;
-    private float newInfectorOfAug;
-    private float newInfectorOfSep;
-    private float newInfectorOfOct;
-    private float newInfectorOfNov;
-    private float newInfectorOfDec;
-
-    //Declare the dictionaluy has the number of new patients of each month
-    private Dictionary<string, float> infectionNumDictionary;
-
-    //Declare the dictionary of the infected area
-    //private Dictionary<string, float> infectedAreaDictionary;
-
-    //For area color map
-    //private float area1;
-    //private float area2;
-    //private float area3;
-    //private float area4;
-    //private float area5;
-    //private float area6;
-    //private float area7;
-    //private float area8;
-    //private float area9;
+    private static float newInfectorOfJan;
+    private static float newInfectorOfFeb;
+    private static float newInfectorOfMar;
+    private static float newInfectorOfApr;
+    private static float newInfectorOfMay;
+    private static float newInfectorOfJun;
+    private static float newInfectorOfJul;
+    private static float newInfectorOfAug;
+    private static float newInfectorOfSep;
+    private static float newInfectorOfOct;
+    private static float newInfectorOfNov;
+    private static float newInfectorOfDec;
+    private static Dictionary<string, float> infectionNumDictionary;
 
     #endregion
 
     #region Constructor
 
-    //Initialization the Monthly infector dictionary
-    public infectedDataBase()
+    //Initialize the dictionary
+    static infectedDataBase()
     {
         Debug.Log("CALL!!!!!!!!!!!!!");
         infectionNumDictionary = new Dictionary<string, float>();
-        infectionNumDictionary.Add("January", 5);
+        infectionNumDictionary.Add("January", 0);
         infectionNumDictionary.Add("February", 0);
         infectionNumDictionary.Add("March", 0);
         infectionNumDictionary.Add("April", 0);
@@ -81,25 +64,11 @@ public class infectedDataBase : MonoBehaviour
         MonthSetting();
     }
 
-    //Initialization the infector area dictionary
-    //public infectedAreaDataBase() //クラス起こす？
-    //{
-    //    infectedAreaDictionary = new Dictionary<string, float>();
-    //    infectedAreaDictionary.Add("Area1", 5);
-    //    infectedAreaDictionary.Add("Area2", 0);
-    //    infectedAreaDictionary.Add("Area3", 0);
-    //    infectedAreaDictionary.Add("Area4", 0);
-    //    infectedAreaDictionary.Add("Area5", 0);
-    //    infectedAreaDictionary.Add("Area6", 0);
-    //    infectedAreaDictionary.Add("Area7", 0);
-    //    infectedAreaDictionary.Add("Area8", 0);
-    //    infectedAreaDictionary.Add("Area9", 0);
-    //}
-
     #endregion
 
     #region Properties
-    public Dictionary<string, float> InfectionNumDictionary
+
+    public static Dictionary<string, float> InfectionNumDictionary
     {
         get { return infectionNumDictionary; }
     }
@@ -107,7 +76,8 @@ public class infectedDataBase : MonoBehaviour
 
     #region Methods
 
-    private void MonthSetting()
+    //Set the milestome to the end of each month
+    private static void MonthSetting()
     {
         janEndTime = dayTime * DateTime.DaysInMonth(2021, 1);
         febEndTime = janEndTime + dayTime * DateTime.DaysInMonth(2021, 2);
@@ -123,90 +93,93 @@ public class infectedDataBase : MonoBehaviour
         decEndTime = novEndTime + dayTime * DateTime.DaysInMonth(2021, 12);
     }
     
-    public void MonthlyNewInfector(GameObject[] humanArr)
-    {
-        //GameObject[] humanArr = SearchHuman();
-        Debug.Log("Human: " + humanArr.Length);
-        for (int i = 0; i < humanArr.Length; i++)
+    //Count  patients
+    public static void MonthlyNewInfector(float beInfectionNegativeTime)
+    {  
+        if (beInfectionNegativeTime <= janEndTime)
         {
-            if (humanArr[i].GetComponent<Infection>().beInfectionNegativeTime != 0)
-            {
-                float tempbeInfectionNegativeTime =
-                humanArr[i].GetComponent<Infection>().beInfectionNegativeTime;
-
-                if (tempbeInfectionNegativeTime <= janEndTime) { newInfectorOfJan++; }
-                else if (tempbeInfectionNegativeTime <= febEndTime) { newInfectorOfFeb++; }
-                else if (tempbeInfectionNegativeTime <= marEndTime) { newInfectorOfMar++; }
-                else if (tempbeInfectionNegativeTime <= aprEndTime) { newInfectorOfApr++; }
-                else if (tempbeInfectionNegativeTime <= mayEndTime) { newInfectorOfMay++; }
-                else if (tempbeInfectionNegativeTime <= junEndTime) { newInfectorOfJun++; }
-                else if (tempbeInfectionNegativeTime <= julEndTime) { newInfectorOfJul++; }
-                else if (tempbeInfectionNegativeTime <= augEndTime) { newInfectorOfAug++; }
-                else if (tempbeInfectionNegativeTime <= sepEndTime) { newInfectorOfSep++; }
-                else if (tempbeInfectionNegativeTime <= octEndTime) { newInfectorOfOct++; }
-                else if (tempbeInfectionNegativeTime <= novEndTime) { newInfectorOfNov++; }
-                else if (tempbeInfectionNegativeTime <= decEndTime) { newInfectorOfDec++; }
-            }
+            newInfectorOfJan++;
+            infectionNumDictionary["January"] = newInfectorOfJan;
+            Debug.Log("Jan" + newInfectorOfJan);
         }
 
-        infectionNumDictionary["January"] = newInfectorOfJan;
-        infectionNumDictionary["February"] = newInfectorOfFeb;
-        infectionNumDictionary["March"] = newInfectorOfMar;
-        infectionNumDictionary["April"] = newInfectorOfApr;
-        infectionNumDictionary["May"] = newInfectorOfMay;
-        infectionNumDictionary["June"] = newInfectorOfJun;
-        infectionNumDictionary["July"] = newInfectorOfJul;
-        infectionNumDictionary["August"] = newInfectorOfAug;
-        infectionNumDictionary["September"] = newInfectorOfSep;
-        infectionNumDictionary["Octorber"] = newInfectorOfOct;
-        infectionNumDictionary["Novenmber"] = newInfectorOfNov;
-        infectionNumDictionary["December"] = newInfectorOfDec;
+        else if (beInfectionNegativeTime <= febEndTime) 
+        { 
+            newInfectorOfFeb++;
+            infectionNumDictionary["February"] = newInfectorOfFeb;
+            Debug.Log("Feb" + newInfectorOfFeb);
+        }
 
-        //Debug.Log("newInfectorOfJan: " + newInfectorOfJan);
-        //Debug.Log("newInfectorOfFeb: " + newInfectorOfFeb);
-        //Debug.Log("newInfectorOfMar: " + newInfectorOfMar);
-        //Debug.Log("newInfectorOfApr: " + newInfectorOfApr);
-        //Debug.Log("newInfectorOfMay: " + newInfectorOfMay);
-        //Debug.Log("newInfectorOfJun: " + newInfectorOfJun);
-        //Debug.Log("newInfectorOfJul: " + newInfectorOfJul);
-        //Debug.Log("newInfectorOfAug: " + newInfectorOfAug);
-        //Debug.Log("newInfectorOfSep: " + newInfectorOfSep);
-        //Debug.Log("newInfectorOfOct: " + newInfectorOfOct);
-        //Debug.Log("newInfectorOfNov: " + newInfectorOfNov);
-        //Debug.Log("newInfectorOfDec: " + newInfectorOfDec);
+        else if (beInfectionNegativeTime <= marEndTime)
+        {
+            newInfectorOfMar++;
+            infectionNumDictionary["March"] = newInfectorOfMar;
+            Debug.Log("Mar" + newInfectorOfMar);
+        }
+
+        else if (beInfectionNegativeTime <= aprEndTime)
+        {
+            newInfectorOfApr++;
+            infectionNumDictionary["April"] = newInfectorOfApr;
+            Debug.Log("Apr" + newInfectorOfApr);
+        }
+
+        else if (beInfectionNegativeTime <= mayEndTime) 
+        {
+            newInfectorOfMay++;
+            infectionNumDictionary["May"] = newInfectorOfMay;
+            Debug.Log("May" + newInfectorOfMay);
+        }
+
+        else if (beInfectionNegativeTime <= junEndTime)
+        {
+            newInfectorOfJun++;
+            infectionNumDictionary["June"] = newInfectorOfJun;
+            Debug.Log("Jun" + newInfectorOfJun);
+        }
+
+        else if (beInfectionNegativeTime <= julEndTime) 
+        {
+            newInfectorOfJul++; 
+            infectionNumDictionary["July"] = newInfectorOfJul;
+            Debug.Log("Jul" + newInfectorOfJul);
+        }
+
+        else if (beInfectionNegativeTime <= augEndTime)
+        {
+            newInfectorOfAug++;
+            infectionNumDictionary["August"] = newInfectorOfAug;
+            Debug.Log("Aug" + newInfectorOfAug);
+        }
+
+        else if (beInfectionNegativeTime <= sepEndTime) 
+        {
+            newInfectorOfSep++;
+            infectionNumDictionary["September"] = newInfectorOfSep;
+            Debug.Log("Sep" + newInfectorOfSep);
+        }
+
+        else if (beInfectionNegativeTime <= octEndTime)
+        {
+            newInfectorOfOct++;
+            infectionNumDictionary["Octorber"] = newInfectorOfOct;
+            Debug.Log("Oct" + newInfectorOfOct);
+        }
+
+        else if (beInfectionNegativeTime <= novEndTime) 
+        {
+            newInfectorOfNov++; 
+            infectionNumDictionary["Novenmber"] = newInfectorOfNov;
+            Debug.Log("Nov" + newInfectorOfNov);
+        }
+
+        else if (beInfectionNegativeTime <= decEndTime)
+        {
+            newInfectorOfDec++;
+            infectionNumDictionary["December"] = newInfectorOfDec;
+            Debug.Log("Dec" + newInfectorOfDec);
+        }
     }
-
-    //public void Infectedposition(GameObject[] humanArr)
-    //{
-    //    for (int i = 0; i < humanArr.Length; i++)
-    //    {
-    //        if (humanArr[i].GetComponent<Infection>().infectedPosition != 0)
-    //        {
-    //            float tempbeInfectionNegativeTime =
-    //            humanArr[i].GetComponent<Infection>().infectedPosition;
-
-    //            if (infectedPosition <= janEndTime) { area1++; }
-    //            else if (infectedPosition <= febEndTime) { area2++; }
-    //            else if (infectedPosition <= marEndTime) { area3++; }
-    //            else if (infectedPosition <= aprEndTime) { area4++; }
-    //            else if (infectedPosition <= mayEndTime) { area5++; }
-    //            else if (infectedPosition <= junEndTime) { area6++; }
-    //            else if (infectedPosition <= julEndTime) { area7++; }
-    //            else if (infectedPosition <= augEndTime) { area8++; }
-    //            else if (infectedPosition <= decEndTime) { area9++; }
-    //        }
-    //    }
-
-    //    infectionNumDictionary["Area1"] = newInfectorOfJan;
-    //    infectionNumDictionary["Area2"] = newInfectorOfFeb;
-    //    infectionNumDictionary["Area3"] = newInfectorOfMar;
-    //    infectionNumDictionary["Area4"] = newInfectorOfApr;
-    //    infectionNumDictionary["Area5"] = newInfectorOfMay;
-    //    infectionNumDictionary["Area6"] = newInfectorOfJun;
-    //    infectionNumDictionary["Area7"] = newInfectorOfJul;
-    //    infectionNumDictionary["Area8"] = newInfectorOfAug;
-    //    infectionNumDictionary["Area9"] = newInfectorOfSep;
-    //}
 }
 
 #endregion
