@@ -1,5 +1,4 @@
-using System
-    .Collections;
+using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -10,7 +9,7 @@ public class PlayerBehaviour : MonoBehaviour
     public float m_MoveSpeed = 0.1f;
     public float m_CamSpeedX = 3.0f;
     public float m_CamSpeedY = 3.0f;
-
+    
     private GameObject m_PlayerCam;
     private GameObject m_MainCam;
     private Quaternion m_CameraRotation;
@@ -19,22 +18,10 @@ public class PlayerBehaviour : MonoBehaviour
     private float m_inputX = 0;
     private float m_inputZ = 0;
     
-    private Vector3 m_PlayerMovement;
-    private Vector3 m_Position;
-    private Vector3 m_Direction;
-    private Vector3 m_Distance;
-    private bool m_IsMoving;
-
-
-        // Update is called once per frame
+// Update is called once per frame
 
     private void Start()
     {
-        m_PlayerMovement = new Vector3(
-            transform.position.x,
-            transform.position.y,
-            transform.position.z);
-
         m_MainCam = GameObject.Find("InfectionSimulator/Main Camera");
         m_PlayerCam = GameObject.Find("Player/PlayerCamera");
 
@@ -47,15 +34,11 @@ public class PlayerBehaviour : MonoBehaviour
         float xRot = Input.GetAxis("Mouse X") * m_CamSpeedY;
         float yRot = Input.GetAxis("Mouse Y") * m_CamSpeedX;
 
-        m_CameraRotation *= Quaternion.Euler(
-            -yRot,
-            0,
-            0);
+        m_CameraRotation *= Quaternion.Euler(-yRot,0,0);
+        m_PlayerRotation *= Quaternion.Euler(0,xRot,0);
 
-        m_PlayerRotation *= Quaternion.Euler(
-           0,
-           xRot,
-           0);
+        m_PlayerCam.transform.localRotation = m_CameraRotation;
+        transform.localRotation = m_PlayerRotation;
 
         if (Input.GetKey("space"))
         {
@@ -69,22 +52,17 @@ public class PlayerBehaviour : MonoBehaviour
             m_MainCam.SetActive(false);
             m_PlayerCam.SetActive(true);
         }
-        m_PlayerCam.transform.localRotation = m_CameraRotation;
-        transform.localRotation = m_PlayerRotation;
+        
     }
     private void FixedUpdate()
     {
-        m_inputX = Input.GetAxisRaw("Horizontal") * m_MoveSpeed;
-        m_inputZ = Input.GetAxisRaw("Vertical") * m_MoveSpeed;
+        m_inputX = Input.GetAxis("Horizontal") * m_MoveSpeed;
+        m_inputZ = Input.GetAxis("Vertical") * m_MoveSpeed;
 
-        //m_PlayerMovement.Set(
-        //    m_inputX,
-        //    0,
-        //    m_inputZ);
+        Vector3 cameraForward = Vector3.Scale(m_PlayerCam.transform.forward,new Vector3(1,0,1));
+        Vector3 moveForward = cameraForward * m_inputZ + m_PlayerCam.transform.right * m_inputX;
 
-        //transform.position += m_PlayerMovement;
-
-        transform.position += m_PlayerCam.transform.forward.normalized * m_inputZ + m_PlayerCam.transform.right.normalized * m_inputX;
+       transform.position += moveForward;
     }
 
 }
