@@ -89,6 +89,7 @@ public class Infection : MonoBehaviour
             {
                 healthStatus = HealthStatus.infectionNegative;
                 beInfectionNegativeTime = time;
+                infectedDataBase.MonthlyNewInfector(beInfectionNegativeTime);
             }
         }
         else if (healthStatus == HealthStatus.infectionNegative)
