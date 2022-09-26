@@ -5,6 +5,9 @@ using UnityEngine.SceneManagement;
 
 public class ButtonManager : MonoBehaviour
 {
+    private bool isPolicyAClick = false;
+    private bool isPolicyBClick = false;
+
     //Creat ScenceChange Button
     public void onScenceChangeClick()
     {
@@ -17,16 +20,38 @@ public class ButtonManager : MonoBehaviour
         Debug.Log("DataOutput!!");
     }
 
-    //Creat PolicyA Button
+    //Creat PolicyA Button to Apply and Rest PolicyA
     public void onPolicyAClick()
     {
-        Debug.Log("PolicyA!!");
+        if (isPolicyAClick == false)
+        {
+            Debug.Log("ApplyPolicyA!!");
+            GameObject.Find("GameManager").GetComponent<GameManager>().applyPolicy(covidpolicy.PolicyA);
+            isPolicyAClick = true;
+        }
+        else 
+        {
+            Debug.Log("Reset PolicyA!!");
+            GameObject.Find("GameManager").GetComponent<GameManager>().resetPolicy(covidpolicy.PolicyA);
+            isPolicyAClick = false;
+        }
     }
 
-    //Creat PolicyB Button
+    //Creat PolicyB Button to Apply and Rest PolicyB
     public void onPolicyBClick()
     {
-        Debug.Log("PolicyB!!");
+        if (isPolicyBClick == false)
+        {
+            Debug.Log("ApplyPolicyB!!");
+            GameObject.Find("GameManager").GetComponent<GameManager>().applyPolicy(covidpolicy.PolicyB);
+            isPolicyBClick = true;
+        }
+        else
+        {
+            Debug.Log("Reset PolicyB!!");
+            GameObject.Find("GameManager").GetComponent<GameManager>().resetPolicy(covidpolicy.PolicyB);
+            isPolicyBClick = false;
+        }
     }
 
     //Creat PolicyC Button
@@ -38,8 +63,15 @@ public class ButtonManager : MonoBehaviour
     //Creat Graphic Button
     public void onGraphicClick()
     {
+        //Graph.MakeGraph();
         Debug.Log("Graphic Out!!");
     }
 
-    
+    //Creat Close Graphic Button
+    public void onCloseGraphicClick()
+    {
+        //Graph.onCloseGraphClick();
+    }
+
+
 }
