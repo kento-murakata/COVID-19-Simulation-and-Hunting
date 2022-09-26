@@ -41,6 +41,7 @@ public class GameManager:MonoBehaviour
     public Text textForTotal;
     public Text textForPercentage;
     public Text totalTime;
+    public Text textper;
 
     /////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -61,8 +62,13 @@ public class GameManager:MonoBehaviour
         textForTotal.text = amount.ToString();
         textForStage3.text = stage3Num.ToString();
         testForStage4.text = stage4Num.ToString();
-        textForPercentage.text = ratio.ToString("p");
-        totalTime.text = simCount.ToString();
+        textForPercentage.text = ratio.ToString("p1");
+        totalTime.text = simCount.ToString(".0");
+        if (ratio > 0.5) 
+        {
+            textForPercentage.color = new Color(1.0f, 0.0f, 0.0f, 1.0f);
+            textper.color = new Color(1.0f, 0.0f, 0.0f, 1.0f);
+        }
 
         if (simCount < simTime)
         {
