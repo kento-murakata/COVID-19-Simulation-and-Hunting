@@ -31,7 +31,7 @@ using UnityEngine.UI;
             DeleteExistObjects();
 
             //グラフ描画
-            ShowGraph(GameManager.InfectionNumDictionary);
+            ShowGraph(infectedDataBase.InfectionNumDictionary);
         }
 
         //Closeボタンでグラフを閉じる(ButtonManagerに登録)
