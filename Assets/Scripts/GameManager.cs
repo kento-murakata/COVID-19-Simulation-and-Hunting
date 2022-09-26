@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -203,8 +204,8 @@ public class GameManager:MonoBehaviour
         totalTime.text = simCount.ToString(".0");
         if (ratio > 0.5)
         {
-            textForPercentage.color = new Color(1.0f, 0.0f, 0.0f, 1.0f);
-            textper.color = new Color(1.0f, 0.0f, 0.0f, 1.0f);
+            textForPercentage.color = Color.red;
+            textper.color = Color.red;
         }
     }
 
@@ -257,6 +258,27 @@ public class GameManager:MonoBehaviour
         }
 
     }
+
+    //Output data to jsonfile
+    public void dataOutput(string filename)
+    {
+        DataSave data = new DataSave();
+        StreamWriter writer = new StreamWriter(Application.dataPath + "/" + filename + ".json", false);
+        for (int i = 0; i < personList.Count; i++)
+        {
+            data.id = i;
+            data.healthstatus = (personList[i].GetComponent<HumanBehaviour>().healthStatus).ToString();
+            data.IsFaceMask = personList[i].GetComponent<HumanBehaviour>().IsFaceMask;
+            data.IsBehaviouralRestriction = personList[i].GetComponent<HumanBehaviour>().IsBehaviouralRestriction;
+            string json = JsonUtility.ToJson(data);
+            writer.WriteLine(json);
+        }
+        writer.Flush();
+        writer.Close();
+        Debug.Log("end of output");
+    }
+
+
     //For debug
     private void debugCount()
     {
