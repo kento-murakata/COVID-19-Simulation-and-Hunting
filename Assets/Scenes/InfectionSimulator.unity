@@ -130,9 +130,21 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2182018296071896720, guid: 3999e220f494ba347b3d68dd64544799, type: 3}
+      propertyPath: m_Depth
+      value: -1
+      objectReference: {fileID: 0}
     - target: {fileID: 4484612119576656641, guid: 3999e220f494ba347b3d68dd64544799, type: 3}
       propertyPath: m_Name
       value: InfectionSimulator
+      objectReference: {fileID: 0}
+    - target: {fileID: 4655515535476970254, guid: 3999e220f494ba347b3d68dd64544799, type: 3}
+      propertyPath: m_ReferenceResolution.x
+      value: 1920
+      objectReference: {fileID: 0}
+    - target: {fileID: 4655515535476970254, guid: 3999e220f494ba347b3d68dd64544799, type: 3}
+      propertyPath: m_ReferenceResolution.y
+      value: 1080
       objectReference: {fileID: 0}
     - target: {fileID: 7683396195250342298, guid: 3999e220f494ba347b3d68dd64544799, type: 3}
       propertyPath: m_RootOrder
@@ -177,6 +189,10 @@ PrefabInstance:
     - target: {fileID: 7683396195250342298, guid: 3999e220f494ba347b3d68dd64544799, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7857842181942165096, guid: 3999e220f494ba347b3d68dd64544799, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -35.01294
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3999e220f494ba347b3d68dd64544799, type: 3}
