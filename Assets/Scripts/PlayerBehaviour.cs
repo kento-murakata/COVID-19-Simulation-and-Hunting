@@ -14,6 +14,7 @@ public class PlayerBehaviour : MonoBehaviour
     private GameObject m_MainCam;
     private Quaternion m_CameraRotation;
     private Quaternion m_PlayerRotation;
+    private Animator m_Animator;
 
     private float m_inputX = 0;
     private float m_inputZ = 0;
@@ -28,6 +29,7 @@ public class PlayerBehaviour : MonoBehaviour
     {
         m_MainCam = GameObject.Find("InfectionSimulator/Main Camera");
         m_PlayerCam = GameObject.Find("Player/PlayerCamera");
+        m_Animator = GetComponent<Animator>();
 
         m_PlayerRotation = transform.rotation;
         m_CameraRotation = m_PlayerCam.transform.rotation;
@@ -73,6 +75,18 @@ public class PlayerBehaviour : MonoBehaviour
         Vector3 moveForward = cameraForward * m_inputZ + m_PlayerCam.transform.right * m_inputX;
 
         transform.position += moveForward;
+
+        if(Mathf.Abs(m_inputX) > 0 || Mathf.Abs(m_inputZ) > 0)
+        {
+            if (!m_Animator.GetBool("Run"))
+            {
+                m_Animator.SetBool("Run", true);
+            }
+        }
+        else if (m_Animator.GetBool("Run"))
+        {
+            m_Animator.SetBool("Run", false);
+        }
     }
 
     public void UpdateCursorLock()
