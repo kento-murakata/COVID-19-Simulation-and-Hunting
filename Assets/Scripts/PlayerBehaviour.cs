@@ -46,7 +46,7 @@ public class PlayerBehaviour : MonoBehaviour
         m_PlayerCam.transform.localRotation = m_CameraRotation;
         transform.localRotation = m_PlayerRotation;
 
-        if (Input.GetKey("space"))
+        if (Input.GetKey("right shift"))
         {
             //メインカメラをアクティブに設定
             m_MainCam.SetActive(true);
