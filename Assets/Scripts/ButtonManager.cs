@@ -9,12 +9,7 @@ public class ButtonManager : MonoBehaviour
     private bool isPolicyAClick = false;
     private bool isPolicyBClick = false;
     private bool isPauseResumClick = false;
-
-    //Creat ScenceChange Button
-    public void onScenceChangeClick()
-    {
-        //SceneManager.LoadScene("Graphic");
-    }
+    public bool isStartClick = false;
 
     //Creat dataoutput Button
     public void onDataClick()

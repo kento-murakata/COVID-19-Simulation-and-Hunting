@@ -10,4 +10,5 @@ using UnityEngine;
         public string healthstatus;
         public bool IsFaceMask;
         public bool IsBehaviouralRestriction;
+        //public bool isRestricted;
     }
