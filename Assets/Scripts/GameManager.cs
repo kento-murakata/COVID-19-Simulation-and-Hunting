@@ -19,8 +19,7 @@ public class GameManager:MonoBehaviour
     public float ratioOfHealth;
     public float simTime;
     //define prefabs
-    [SerializeField]
-    private GameObject prefabs;
+    public GameObject prefabs;
 
     //define const
     public Color stage1Color = Color.cyan;
@@ -31,6 +30,8 @@ public class GameManager:MonoBehaviour
     public float detectRadius = 0.5f;
     public float collisionHoldingTime = 1.0f;
     public float healthPoint = 100f;
+    private float maskEffect = 0.5f;
+    private float behaviuralRestrictionEffect = 0.5f;
 
     //define control parameter
     private float simCount = 0;
@@ -41,19 +42,30 @@ public class GameManager:MonoBehaviour
     private int stage3Num = 0;
     private int stage4Num = 0;
     private float ratio = 0f;
+    private float checkTime = 0;
     public Text textForStage3;
     public Text testForStage4;
     public Text textForTotal;
     public Text textForPercentage;
     public Text totalTime;
     public Text textper;
+    public InputField amoutInput;
+    public InputField ratioInput;
+    public InputField simTimeInput;
+    public Button startSim;
+
 
     /////////////////////////////////////////////////////////////////////////////////////////////
-
     private void Start()
     {
-        personClone(prefabs, amount, ratioOfHealth);
+
+        //Time.timeScale = 0;
+        //GameObject.Find("InputUI").SetActive(true);
+        //startSim.onClick.AddListener(gameStart);
+
+        GameObject.Find("InputUI").SetActive(false);
         initializeText();
+        personClone(prefabs, amount, ratioOfHealth);
         checkPolicy(covidpolicy.PolicyA);
         checkPolicy(covidpolicy.PolicyB);
     }
@@ -62,27 +74,67 @@ public class GameManager:MonoBehaviour
     {
         updateText();
         checkSimTime();
+        //    if (checkTime >= 1)
+        //    {
+        //        checkStage4Instance();
+        //        returnStage4Instance();
+        //        checkTime = 0;
+        //    }
+        //    else 
+        //    {
+        //        checkTime += Time.deltaTime;
+        //    }
     }
     /////////////////////////////////////////////////////////////////////////////////////////////
 
+    //Start Scene
+    public void gameStart() 
+    {
+            updateInput();
+            initializeText();
+            personClone(prefabs, amount, ratioOfHealth);
+            checkPolicy(covidpolicy.PolicyA);
+            checkPolicy(covidpolicy.PolicyB);
+            Time.timeScale = 1;
+            GameObject.Find("InputUI").SetActive(false);
+    }
+
     //Creat the instance from Prefabs
-    private void personClone(GameObject prefabs, float amount, float ratio)
+    public void personClone(GameObject prefabs, float amount, float ratio)
     {
         for (int i = 0; i < Mathf.Ceil(amount * ratio); i++)
         {
             Vector3 appearPos = LocationDeter();
             GameObject clonePersons = Instantiate(prefabs, appearPos, Quaternion.identity);
             clonePersons.GetComponent<HumanBehaviour>().ChangeHealthStatus(HealthStatus.negative);
+            clonePersons.GetComponent<HumanBehaviour>().IsBehaviouralRestriction = false;
+            //clonePersons.GetComponent<HumanBehaviour>().isRestricted = false;
+            //clonePersons.GetComponent<HumanBehaviour>().MoveDuration = moveDuration;
             clonePersons.GetComponent<HumanBehaviour>().IsFaceMask = randomBool();
-            clonePersons.GetComponent<HumanBehaviour>().IsBehaviouralRestriction = randomBool();
+
+            ////release after hirano san pull
+            //int maskStatus = Random.Range(0, 2);
+            //switch (maskStatus) 
+            //{
+            //    case 0:
+            //        clonePersons.GetComponent<HumanBehaviour>().IsFaceMask = false;
+            //        clonePersons.GetComponent<HumanBehaviour>().DetectRadius = detectRadius;
+            //        break;
+            //    case 1:
+            //        clonePersons.GetComponent<HumanBehaviour>().IsFaceMask = true;
+            //        clonePersons.GetComponent<HumanBehaviour>().DetectRadius = detectRadius*maskEffect;
+            //        break;
+            //}
+
+
             personList.Add(clonePersons);
         }
         for (int i = 0; i < (amount - Mathf.Ceil(amount * ratio)); i++)
         {
             Vector3 appearPos = LocationDeter();
             GameObject clonePersons = Instantiate(prefabs, appearPos, Quaternion.identity);
-            int status = Random.Range(1, 3);
-            switch (status) 
+            int healthstatus = Random.Range(1, 3);
+            switch (healthstatus) 
             {
                 case 1:
                     clonePersons.GetComponent<HumanBehaviour>().ChangeHealthStatus(HealthStatus.infectionNegative);
@@ -91,8 +143,24 @@ public class GameManager:MonoBehaviour
                     clonePersons.GetComponent<HumanBehaviour>().ChangeHealthStatus(HealthStatus.infectionPositive);
                     break;
             }
+            clonePersons.GetComponent<HumanBehaviour>().IsBehaviouralRestriction = false;
+            //clonePersons.GetComponent<HumanBehaviour>().isRestricted = false;
+            //clonePersons.GetComponent<HumanBehaviour>().MoveDuration = moveDuration;
             clonePersons.GetComponent<HumanBehaviour>().IsFaceMask = randomBool();
-            clonePersons.GetComponent<HumanBehaviour>().IsBehaviouralRestriction = randomBool();
+            ////release after hirano san pull
+            //int maskStatus = Random.Range(0, 2);
+            //switch (maskStatus)
+            //{
+            //    case 0:
+            //        clonePersons.GetComponent<HumanBehaviour>().IsFaceMask = false;
+            //        clonePersons.GetComponent<HumanBehaviour>().DetectRadius = detectRadius;
+            //        break;
+            //    case 1:
+            //        clonePersons.GetComponent<HumanBehaviour>().IsFaceMask = true;
+            //        clonePersons.GetComponent<HumanBehaviour>().DetectRadius = detectRadius * maskEffect;
+            //        break;
+            //}
+
             personList.Add(clonePersons);
         }
     }
@@ -182,8 +250,40 @@ public class GameManager:MonoBehaviour
         }
     }
 
+    ////Check Stage4Instance
+    //private void checkStage4Instance() 
+    //{
+    //    for (int i = 0; i < personList.Count; i++)
+    //    {
+    //        if (personList[i].GetComponent<HumanBehaviour>().healthStatus == HealthStatus.onsetAndQuarantine
+    //            && personList[i].GetComponent<HumanBehaviour>().isRestricted==0)
+    //        {
+    //            personList[i].transform.position = new Vector3(-300, -25, 30);
+    //            personList[i].GetComponent<HumanBehaviour>().isRestricted == 1;
+    //            personList[i].GetComponent<HumanBehaviour>().MoveDuration =0;
+
+    //        }
+    //    }
+    //}
+
+    //Return Stage4Instance
+    //private void returnStage4Instance() 
+    //{
+    //    for (int i = 0; i < personList.Count; i++)
+    //    {
+    //        if (personList[i].GetComponent<HumanBehaviour>().healthStatus == HealthStatus.infectionNegative
+    //            && personList[i].GetComponent<HumanBehaviour>().isRestricted == 1)
+    //        {
+    //            personList[i].transform.position = LocationDeter();
+    //            personList[i].GetComponent<HumanBehaviour>().isRestricted == 0;
+    //            //To change the moveduration if policyB is applied
+    //            personList[i].GetComponent<HumanBehaviour>().MoveDuration = moveDuration;
+    //        }
+    //    }
+    //}
+
     //Initialize the TextContent
-    private void initializeText()
+    public void initializeText()
     {
         stage3Num = checkStatus(HealthStatus.infectionPositive);
         stage4Num = checkStatus(HealthStatus.onsetAndQuarantine);
@@ -218,6 +318,7 @@ public class GameManager:MonoBehaviour
                 for (int i = 0; i < personList.Count; i++)
                 {
                     personList[i].GetComponent<HumanBehaviour>().IsFaceMask = true;
+                    //personList[i].GetComponent<HumanBehaviour>().DetectRadius = detectRadius * maskEffect;
                 }
                 checkPolicy(covidpolicy.PolicyA);
                 break;
@@ -225,6 +326,7 @@ public class GameManager:MonoBehaviour
                 for (int i = 0; i < personList.Count; i++)
                 {
                     personList[i].GetComponent<HumanBehaviour>().IsBehaviouralRestriction = true;
+                    //personList[i].GetComponent<HumanBehaviour>().MoveDuration = moveDuration * behaviuralRestrictionEffect;
                 }
                 checkPolicy(covidpolicy.PolicyB);
                 break;
@@ -243,13 +345,27 @@ public class GameManager:MonoBehaviour
                 for (int i = 0; i < personList.Count; i++)
                 {
                     personList[i].GetComponent<HumanBehaviour>().IsFaceMask = randomBool();
+                    ////release after hirano san pull
+                    //int maskStatus = Random.Range(0, 2);
+                    //switch (maskStatus)
+                    //{
+                    //    case 0:
+                    //        personList[i].GetComponent<HumanBehaviour>().IsFaceMask = false;
+                    //        personList[i].GetComponent<HumanBehaviour>().DetectRadius = detectRadius;
+                    //        break;
+                    //    case 1:
+                    //        personList[i].GetComponent<HumanBehaviour>().IsFaceMask = true;
+                    //        personList[i].GetComponent<HumanBehaviour>().DetectRadius = detectRadius * maskEffect;
+                    //        break;
+                    //}
                 }
                 checkPolicy(covidpolicy.PolicyA);
                 break;
             case covidpolicy.PolicyB:
                 for (int i = 0; i < personList.Count; i++)
                 {
-                    personList[i].GetComponent<HumanBehaviour>().IsBehaviouralRestriction = randomBool();
+                    personList[i].GetComponent<HumanBehaviour>().IsBehaviouralRestriction = false;
+                    //personList[i].GetComponent<HumanBehaviour>().MoveDuration = moveDuration
                 }
                 checkPolicy(covidpolicy.PolicyB);
                 break;
@@ -270,12 +386,21 @@ public class GameManager:MonoBehaviour
             data.healthstatus = (personList[i].GetComponent<HumanBehaviour>().healthStatus).ToString();
             data.IsFaceMask = personList[i].GetComponent<HumanBehaviour>().IsFaceMask;
             data.IsBehaviouralRestriction = personList[i].GetComponent<HumanBehaviour>().IsBehaviouralRestriction;
+            //data.isRestricted= personList[i].GetComponent<HumanBehaviour>().isRestricted;
             string json = JsonUtility.ToJson(data);
             writer.WriteLine(json);
         }
         writer.Flush();
         writer.Close();
         Debug.Log("end of output");
+    }
+
+    //CheckInput
+    public void updateInput() 
+    {
+        amount = float.Parse(amoutInput.GetComponent<InputField>().text.ToString());
+        ratioOfHealth = float.Parse(ratioInput.GetComponent<InputField>().text.ToString());
+        simTime = float.Parse(simTimeInput.GetComponent<InputField>().text.ToString());
     }
 
 
