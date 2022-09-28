@@ -53,6 +53,7 @@ public class GameManager:MonoBehaviour
     public InputField ratioInput;
     public InputField simTimeInput;
     public Button startSim;
+    private bool isCursorlock = true;
 
 
     /////////////////////////////////////////////////////////////////////////////////////////////
@@ -68,6 +69,10 @@ public class GameManager:MonoBehaviour
         personClone(prefabs, amount, ratioOfHealth);
         checkPolicy(covidpolicy.PolicyA);
         checkPolicy(covidpolicy.PolicyB);
+    }
+    private void FixedUpdate()
+    {
+        UpdateCursorLock();
     }
 
     private void Update()
@@ -402,6 +407,30 @@ public class GameManager:MonoBehaviour
         ratioOfHealth = float.Parse(ratioInput.GetComponent<InputField>().text.ToString());
         simTime = float.Parse(simTimeInput.GetComponent<InputField>().text.ToString());
     }
+
+    //CurorLock When PlayerMode
+    private void UpdateCursorLock()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            isCursorlock = false;
+        }
+        else if (Input.GetMouseButton(0))
+        {
+            isCursorlock = true;
+        }
+        if (isCursorlock)
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+        }
+        else if (!isCursorlock)
+        {
+            Cursor.lockState = CursorLockMode.None;
+        }
+    }
+
+
+
 
 
     //For debug

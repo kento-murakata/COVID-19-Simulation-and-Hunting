@@ -96,14 +96,14 @@ public class ButtonManager : MonoBehaviour
     //Creat Graphic Button
     public void onGraphicClick()
     {
-        //Graph.MakeGraph();
+        Graph.MakeGraph();
         Debug.Log("Graphic Out!!");
     }
 
     //Creat Close Graphic Button
     public void onCloseGraphicClick()
     {
-        //Graph.onCloseGraphClick();
+        Graph.onCloseGraphClick();
     }
 
 
