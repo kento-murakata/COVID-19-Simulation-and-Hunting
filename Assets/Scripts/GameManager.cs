@@ -12,8 +12,8 @@ public enum covidpolicy
     PolicyB,
 }
 
-public class GameManager:MonoBehaviour
-    {
+public class GameManager : MonoBehaviour
+{
     //user input
     public float amount;
     public float ratioOfHealth;
@@ -35,7 +35,6 @@ public class GameManager:MonoBehaviour
 
     //define control parameter
     private float simCount = 0;
-    public List<GameObject> PersonList { get; set; }
     private List<GameObject> personList = new List<GameObject>();
     private int stage1Num = 0;
     private int stage2Num = 0;
@@ -43,6 +42,7 @@ public class GameManager:MonoBehaviour
     private int stage4Num = 0;
     private float ratio = 0f;
     private float checkTime = 0;
+    private bool isCursorlock = true;
     public Text textForStage3;
     public Text testForStage4;
     public Text textForTotal;
@@ -53,6 +53,8 @@ public class GameManager:MonoBehaviour
     public InputField ratioInput;
     public InputField simTimeInput;
     public Button startSim;
+
+    public List<GameObject> PersonList { get; set; }
 
 
     /////////////////////////////////////////////////////////////////////////////////////////////
@@ -85,6 +87,12 @@ public class GameManager:MonoBehaviour
         //        checkTime += Time.deltaTime;
         //    }
     }
+
+    private void FixedUpdate()
+    {
+        UpdateCursorLock();
+    }
+
     /////////////////////////////////////////////////////////////////////////////////////////////
 
     //Start Scene
@@ -109,7 +117,6 @@ public class GameManager:MonoBehaviour
             clonePersons.GetComponent<HumanBehaviour>().ChangeHealthStatus(HealthStatus.negative);
             clonePersons.GetComponent<HumanBehaviour>().IsBehaviouralRestriction = false;
             //clonePersons.GetComponent<HumanBehaviour>().isRestricted = false;
-            //clonePersons.GetComponent<HumanBehaviour>().MoveDuration = moveDuration;
             clonePersons.GetComponent<HumanBehaviour>().IsFaceMask = randomBool();
 
             ////release after hirano san pull
@@ -145,7 +152,6 @@ public class GameManager:MonoBehaviour
             }
             clonePersons.GetComponent<HumanBehaviour>().IsBehaviouralRestriction = false;
             //clonePersons.GetComponent<HumanBehaviour>().isRestricted = false;
-            //clonePersons.GetComponent<HumanBehaviour>().MoveDuration = moveDuration;
             clonePersons.GetComponent<HumanBehaviour>().IsFaceMask = randomBool();
             ////release after hirano san pull
             //int maskStatus = Random.Range(0, 2);
@@ -326,7 +332,6 @@ public class GameManager:MonoBehaviour
                 for (int i = 0; i < personList.Count; i++)
                 {
                     personList[i].GetComponent<HumanBehaviour>().IsBehaviouralRestriction = true;
-                    //personList[i].GetComponent<HumanBehaviour>().MoveDuration = moveDuration * behaviuralRestrictionEffect;
                 }
                 checkPolicy(covidpolicy.PolicyB);
                 break;
@@ -365,7 +370,6 @@ public class GameManager:MonoBehaviour
                 for (int i = 0; i < personList.Count; i++)
                 {
                     personList[i].GetComponent<HumanBehaviour>().IsBehaviouralRestriction = false;
-                    //personList[i].GetComponent<HumanBehaviour>().MoveDuration = moveDuration
                 }
                 checkPolicy(covidpolicy.PolicyB);
                 break;
@@ -402,6 +406,27 @@ public class GameManager:MonoBehaviour
         ratioOfHealth = float.Parse(ratioInput.GetComponent<InputField>().text.ToString());
         simTime = float.Parse(simTimeInput.GetComponent<InputField>().text.ToString());
     }
+
+private void UpdateCursorLock()
+{
+    if (Input.GetKeyDown(KeyCode.Escape))
+    {
+        isCursorlock = false;
+    }
+    else if (Input.GetMouseButton(0))
+    {
+        isCursorlock = true;
+    }
+
+    if (isCursorlock)
+    {
+        Cursor.lockState = CursorLockMode.Locked;
+    }
+    else if (!isCursorlock)
+    {
+        Cursor.lockState = CursorLockMode.None;
+    }
+}
 
 
     //For debug
