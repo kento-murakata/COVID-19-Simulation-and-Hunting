@@ -44,6 +44,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ad9e6c369dd7aed488bd18d5fb6f72ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  destinationObj: {fileID: 0}
-  numberOfDestinations: 5
-  destinations: []
+  stageObj: {fileID: 82380577705194140, guid: c6782fd84b080334697a018adb5c9a33, type: 3}
+  destinationObj: {fileID: 6205738548044188230, guid: 6e453995846682844832d7773bf8ec6f, type: 3}
+  circleRatio: 0.9
+  destinationColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  MaximumNumberOfDestinations: 20
