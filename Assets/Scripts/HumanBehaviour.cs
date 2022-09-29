@@ -1,8 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using Unity.VisualScripting;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -14,61 +10,128 @@ public enum HealthStatus
     onsetAndQuarantine,
 }
 
+[System.Serializable]
+public enum BehavioralPattern
+{
+    home,
+    work,
+    fun
+}
+
+[System.Serializable]
+public class MyDestination : Destination
+{
+    [SerializeField]
+    private BehavioralPattern behavioralPattern;
+
+    public BehavioralPattern BehavioralPattern { get { return this.behavioralPattern; } }
+
+    //constructor
+    public MyDestination(Destination destination, BehavioralPattern behavioralPattern) : base(destination)
+    {
+        this.behavioralPattern = behavioralPattern;
+    }
+
+    protected MyDestination(MyDestination other) : base(other)
+    {
+        this.behavioralPattern = other.behavioralPattern;
+    }
+}
+
 public class HumanBehaviour : MonoBehaviour
 {
     [SerializeField]
-    private Color directionColor = Color.blue; //進路可視化(デバッグ用)
+    private int numberOfDestinations = 3;
 
     [SerializeField]
-    private HealthStatus initHealthStatus = HealthStatus.negative;
-
-    [SerializeField]
-    private HealthStatus currentStatus;
-
-    private HealthStatus preStatus;
-
-    public bool IsFaceMask { get; set; } //マスク有無
-
-    public bool IsBehaviouralRestriction { get; set; } //行動制限有無
-
-    public HealthStatus healthStatus
-    {
-        get { return currentStatus; }
-    }
-
-    public float HealthPoint
-    {
-        get { return healthPoint; }
-    }
+    private List<MyDestination> destinations = new List<MyDestination>();
 
     private GameManager gameManager;
+    private DestinationManager destinationManager;
+    private Infection infection;
+
     private NavMeshAgent m_navMesh;
     private HumanDetector m_detector;
     private Material m_bodyMaterial;
-    private Infection infection;
 
-    private float moveDuration = 5.0f; //最大移動距離 (行動制限有無)
-    private float detectRadius = 0.5f; //他人との接触判定距離
-    private float moveVelocity = 3.5f;
-    private float collisionHoldingTime = 3.0f; //人同士の衝突保持時間
-    private float healthPoint = 100; //HP
-    private float faceMaskEffect = 2.0f; //マスク有の時の接触判定距離縮小効果
-    
+    private HealthStatus currentHealthStatus;
+    private BehavioralPattern currentBehavioralPattern;
+    private MyDestination currentDestination;
+
+    private float healthPoint = 100;
+
+    private float detectRadius = 0.5f;
+
+
+
+    //Distance to others (with/without mask)
+    public float DetectRadius
+    {
+        get { return detectRadius; }
+        set
+        {
+            detectRadius = value;
+
+            //Set radius for collider for judging contact with others
+            SetDetectRadius(detectRadius);
+        }
+    }
+
+    //Behavioral restriction flag (when true, only basic behavior (going back and forth between home and work))
+    public bool IsBehaviouralRestriction { get; set; }
+
+    //Restriction flag
+    public bool IsRestricted { get; set; }
+
+    public HealthStatus healthStatus { get { return currentHealthStatus; } }
+
+    public BehavioralPattern BehavioralPattern { get { return currentBehavioralPattern; } }
+
+    public float HealthPoint { get { return healthPoint; } }
+
+    public List<MyDestination> FunDestinations
+    {
+        get { return GetTargetDestinations(BehavioralPattern.fun); }
+    }
+
+
+
+
+    //TODO detele
+    public bool IsFaceMask { get; set; }
+
+    //TODO detele
+    public float MoveDuration
+    {
+        get { return moveDuration; }
+        set { moveDuration = value; }
+    }
+
+    //TODO detele
+    private float moveDuration = 5.0f;
+
+
+
     private void Awake()
     {
         GetComponents();
 
         UpdateManager updateManager = GameObject.Find("UpdateManager").GetComponent<UpdateManager>();
         updateManager.list.Add(this);
+
+        //Select a specified number of destinations randomly from the destination list
+        SetDestinations();
     }
 
     private void Start()
     {
-        SetDetectRadius(detectRadius);
+        //get nearest destination
+        GetTargetDestinations(BehavioralPattern.home);
     }
 
     public void UpdateMe()
     {
+        //TODO stop movement when IsRestricted is true
         SetDestination();
         CheckHealthStatus();
         ChangeBodyColor();
@@ -76,18 +139,51 @@ public class HumanBehaviour : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.transform.CompareTag("Human"))
+        //Change of course in the event of a collision between humans
+        if (other.transform.CompareTag("Human") && gameObject != other.gameObject)
         {
-            ChangeDestination();
+            if (!IsBehaviouralRestriction)
+            {
+                var human_other = other.gameObject.GetComponent<HumanBehaviour>();
+
+                var funDestinations_other = human_other.FunDestinations;
+
+                //Check for common interests
+                List<MyDestination> sameDestinations = new List<MyDestination>();
+                foreach (var otherDestination in funDestinations_other)
+                {
+                    foreach (var myDestination in FunDestinations)
+                    {
+                        if (myDestination.Position == otherDestination.Position)
+                        {
+                            sameDestinations.Add(myDestination);
+                        }
+                    }
+                }
+
+                if (sameDestinations.Count > 0)
+                {
+                    currentDestination = GetFurthestDestination(sameDestinations);
+                    currentBehavioralPattern = BehavioralPattern.fun;
+                    m_navMesh.SetDestination(currentDestination.Position);
+                }
+            }
+        }
+
+        //When attacked by a player
+        if (other.transform.CompareTag("Player"))
+        {
+
         }
     }
 
     private void GetComponents()
     {
-        // add GameManager Component
+        // add GameManager
         gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
-        moveDuration = gameManager.moveDuration;
-        detectRadius = gameManager.detectRadius;
+
+        // add DestinationManager
+        destinationManager = GameObject.Find("DestinationManager").GetComponent<DestinationManager>();
 
         // add NavMeshAgent Component for object movement
         m_navMesh = GetComponent<NavMeshAgent>();
@@ -101,41 +197,122 @@ public class HumanBehaviour : MonoBehaviour
         m_bodyMaterial = GetComponent<Renderer>().material;
     }
 
+    private void SetDestinations()
+    {
+        var destinationList = destinationManager.DestinationList;
+        var selectDestinations = new List<Destination>();
+
+        //Select randomly as many as numberOfDestinations
+        while (selectDestinations.Count < numberOfDestinations)
+        {
+            var selectDestination = destinationList[Random.Range(0, destinationList.Count)];
+
+            if (!selectDestinations.Contains(selectDestination))
+            {
+                selectDestinations.Add(selectDestination);
+            }
+        }
+
+        //Assign KindOdDestination
+        for (int i = 0; i < numberOfDestinations; i++)
+        {
+            MyDestination myDestination;
+
+            //home
+            if (i == 0)
+            {
+                myDestination = new MyDestination(selectDestinations[i], BehavioralPattern.home);
+            }
+
+            //work
+            else if (i == 1)
+            {
+                myDestination = new MyDestination(selectDestinations[i], BehavioralPattern.work);
+            }
+
+            //fun
+            else
+            {
+                myDestination = new MyDestination(selectDestinations[i], BehavioralPattern.fun);
+            }
+
+            destinations.Add(myDestination);
+        }
+    }
+
     private void SetDestination()
     {
         if (m_navMesh != null)
         {
-            if (m_navMesh.remainingDistance < 0.1f)
+            //If no destination is set, or if a destination is reached, the next destination is set
+            if (m_navMesh.hasPath && m_navMesh.remainingDistance < 2.1f)
             {
-                StartCoroutine(Wait(collisionHoldingTime));
+                m_navMesh.ResetPath();
 
-                float moveDurationX = Random.Range(-moveDuration, moveDuration);
-                float moveDurationZ = Random.Range(-moveDuration, moveDuration);
+                // change destination
+                if (currentBehavioralPattern == BehavioralPattern.home)
+                {
+                    currentBehavioralPattern = BehavioralPattern.work;
+                }
+                else if (currentBehavioralPattern == BehavioralPattern.work)
+                {
+                    currentBehavioralPattern = BehavioralPattern.home;
+                }
+                else
+                {
+                    currentBehavioralPattern = BehavioralPattern.home;
+                }
+            }
 
-                Vector3 targetPosition = new Vector3(
-                   transform.position.x + moveDurationX,
-                   transform.position.y,
-                   transform.position.z + moveDurationZ);
-
-                m_navMesh.SetDestination(targetPosition);
+            if (!m_navMesh.hasPath)
+            {
+                var currentDestinations = GetTargetDestinations(currentBehavioralPattern);
+                currentDestination = currentDestinations[Random.Range(0, currentDestinations.Count)];
+                m_navMesh.SetDestination(currentDestination.Position);
             }
         }
+
+        //TODO escape movement
     }
 
-    //人同士の衝突時に進路変更を実施
-    private void ChangeDestination()
+    //Get nearest destination
+    private MyDestination GetNearestDestination(List<MyDestination> destinations)
     {
-        m_navMesh.ResetPath();
+        destinations.Sort(delegate (MyDestination a, MyDestination b) {
+            return Vector3.Distance(transform.position, a.Position).CompareTo(Vector3.Distance(transform.position, b.Position));
+        });
+
+        return destinations[0];
+    }
+
+    //Get furthest destination
+    private MyDestination GetFurthestDestination(List<MyDestination> destinations)
+    {
+        destinations.Sort(delegate (MyDestination a, MyDestination b) {
+            return Vector3.Distance(transform.position, b.Position).CompareTo(Vector3.Distance(transform.position, a.Position));
+        });
+
+        return destinations[0];
+    }
+
+    private List<MyDestination> GetTargetDestinations(BehavioralPattern bp)
+    {
+        return destinations.FindAll(x => x.BehavioralPattern == bp);
+    }
+
+    private void GetMovementStatus()
+    {
+        currentBehavioralPattern = currentDestination.BehavioralPattern;
     }
 
     private void CheckHealthStatus()
     {
-        currentStatus = infection.Test(this, m_detector.ContactHumans);
+        currentHealthStatus = infection.Test(this, m_detector.ContactHumans);
     }
 
     public void ChangeHealthStatus(HealthStatus status)
     {
-        currentStatus = status;
+        currentHealthStatus = status;
     }
     public void SetDetectRadius(float radius)
     {
@@ -144,40 +321,28 @@ public class HumanBehaviour : MonoBehaviour
 
     private void ChangeBodyColor()
     {
-        if (preStatus != currentStatus)
+        switch (currentHealthStatus)
         {
-            switch (currentStatus)
-            {
-                case HealthStatus.infectionNegative:
-                    m_bodyMaterial.color = gameManager.stage2Color;
-                    break;
-                case HealthStatus.infectionPositive:
-                    m_bodyMaterial.color = gameManager.stage3Color;
-                    break;
-                case HealthStatus.onsetAndQuarantine:
-                    m_bodyMaterial.color = gameManager.stage4Color;
-                    break;
-                default:
-                    m_bodyMaterial.color = gameManager.stage1Color;
-                    break;
-            }
+            case HealthStatus.infectionNegative:
+                m_bodyMaterial.color = gameManager.stage2Color;
+                break;
+            case HealthStatus.infectionPositive:
+                m_bodyMaterial.color = gameManager.stage3Color;
+                break;
+            case HealthStatus.onsetAndQuarantine:
+                m_bodyMaterial.color = gameManager.stage4Color;
+                break;
+            default:
+                m_bodyMaterial.color = gameManager.stage1Color;
+                break;
         }
-        preStatus = currentStatus;
-    }
-
-    private IEnumerator Wait(float waitTime)
-    {
-        var preTime = Time.time;
-        yield return new WaitForSeconds(waitTime);
-        var pastTime = Time.time;
-        //Debug.Log("WaitTime: " + (pastTime - preTime));
     }
 
     //private void OnDrawGizmos()
     //{
-    //    if (m_navMesh && m_navMesh.enabled)
+    //    if (m_navMesh && m_navMesh.enabled && currentBehavioralPattern == BehavioralPattern.fun)
     //    {
-    //        Gizmos.color = directionColor;
+    //        Gizmos.color = Color.blue;
     //        var prePos = transform.position;
     //        prePos.y = 0;
     //        foreach (var pos in m_navMesh.path.corners)
