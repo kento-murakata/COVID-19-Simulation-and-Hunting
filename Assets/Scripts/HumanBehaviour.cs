@@ -53,6 +53,7 @@ public class HumanBehaviour : MonoBehaviour
     private NavMeshAgent m_navMesh;
     private HumanDetector m_detector;
     private Material m_bodyMaterial;
+    private Rigidbody m_rbody;
 
     private HealthStatus currentHealthStatus;
     private BehavioralPattern currentBehavioralPattern;
@@ -173,7 +174,13 @@ public class HumanBehaviour : MonoBehaviour
         //When attacked by a player
         if (other.transform.CompareTag("Player"))
         {
+            //
+            m_rbody.isKinematic = false;
 
+            var direction = transform.position - other.transform.position;
+            m_rbody.AddForce(direction*1000, ForceMode.Impulse);
+
+            m_rbody.isKinematic = true;
         }
     }
 
@@ -195,6 +202,8 @@ public class HumanBehaviour : MonoBehaviour
         infection = gameObject.GetComponent<Infection>();
 
         m_bodyMaterial = GetComponent<Renderer>().material;
+
+        m_rbody = GetComponent<Rigidbody>();
     }
 
     private void SetDestinations()
