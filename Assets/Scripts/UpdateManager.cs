@@ -7,7 +7,7 @@ public class UpdateManager : MonoBehaviour
 {
     public List<HumanBehaviour> list = new List<HumanBehaviour>();
 
-    private HumanBehaviour[] array;
+    private HumanBehaviour[] array = new HumanBehaviour[] { };
 
     public void toStart()
     {
