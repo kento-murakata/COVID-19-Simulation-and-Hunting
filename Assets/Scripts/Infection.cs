@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 
@@ -19,7 +20,9 @@ public class Infection : MonoBehaviour
     [SerializeField]
     public float toOnsetAndQuarantineTime;
     [SerializeField]
-    public float toNegativeTime = 20f * Day;
+    public float toNegativeTime;
+
+
 
 
 
@@ -41,6 +44,12 @@ public class Infection : MonoBehaviour
     private float toOnsetAndQuarantineMinTime = 3f * Day;
     private float toOnsetAndQuarantineMaxTime = 5f * Day;
 
+    private float toNegativeTimeMinTime = 20f * Day;
+    private float toNegativeTimeMaxTime = 20f * Day;
+
+
+
+
     HealthStatus healthStatus;
     GameObject colPositive;
 
@@ -58,6 +67,19 @@ public class Infection : MonoBehaviour
 
     private void Awake()
     {
+        InfectionParams infectionParams = LoadInfectionParams("Assets/Json/InfectionParams.json");
+        if (infectionParams != null)
+        {
+            toInfectionNegativeMinTime = infectionParams.toInfectionNegativeMinTime;
+            toInfectionNegativeMaxTime = infectionParams.toInfectionNegativeMaxTime;
+            toInfectionPositiveMinTime = infectionParams.toInfectionPositiveMinTime;
+            toInfectionPositiveMaxTime = infectionParams.toInfectionPositiveMaxTime;
+            toOnsetAndQuarantineMinTime = infectionParams.toOnsetAndQuarantineMinTime;
+            toOnsetAndQuarantineMaxTime = infectionParams.toOnsetAndQuarantineMaxTime;
+            toNegativeTimeMinTime = infectionParams.toNegativeTimeMinTime;
+            toNegativeTimeMaxTime = infectionParams.toNegativeTimeMaxTime;
+        }
+
         toInfectionNegativeTime = Random.Range(
                     toInfectionNegativeMinTime,
                     toInfectionNegativeMaxTime);
@@ -69,7 +91,46 @@ public class Infection : MonoBehaviour
         toOnsetAndQuarantineTime = Random.Range(
                 toOnsetAndQuarantineMinTime,
                 toOnsetAndQuarantineMaxTime);
+
+        toNegativeTime = Random.Range(
+                toNegativeTimeMinTime,
+                toNegativeTimeMaxTime);
     }
+
+    private class InfectionParams
+    {
+        public float toInfectionNegativeMinTime;
+        public float toInfectionNegativeMaxTime;
+        public float toInfectionPositiveMinTime;
+        public float toInfectionPositiveMaxTime;
+        public float toOnsetAndQuarantineMinTime;
+        public float toOnsetAndQuarantineMaxTime;
+        public float toNegativeTimeMinTime;
+        public float toNegativeTimeMaxTime;
+    }
+
+
+    private InfectionParams LoadInfectionParams(string filename)
+    {
+        try
+        {
+            string datastr = "";
+            StreamReader reader;
+            reader = new StreamReader(filename);
+            datastr = reader.ReadToEnd();
+            reader.Close();
+
+            return JsonUtility.FromJson<InfectionParams>(datastr);
+
+        }catch
+        {
+            Debug.Log("InfectionParams.jsonは読み込まれませんでした。");
+            return null;
+        }
+    }
+
+
+
 
     //todo getcomponent の複数回呼出しをまとめる
     public HealthStatus Test(HumanBehaviour human, List<GameObject> collider)

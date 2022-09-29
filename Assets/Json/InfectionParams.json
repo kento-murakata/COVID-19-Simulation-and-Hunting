@@ -1,0 +1,10 @@
+{
+"toInfectionNegativeMinTime" : 5,
+"toInfectionNegativeMaxTime" : 5,
+"toInfectionPositiveMinTime" : 10,
+"toInfectionPositiveMaxTime" : 10,
+"toOnsetAndQuarantineMinTime" : 10,
+"toOnsetAndQuarantineMaxTime" : 10,
+"toNegativeTimeMinTime" : 10,
+"toNegativeTimeMaxTime" : 10
+}

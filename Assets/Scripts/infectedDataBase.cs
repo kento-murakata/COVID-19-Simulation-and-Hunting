@@ -1,14 +1,12 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
-using System.Linq;
-using System;
 
 public static class infectedDataBase
 {
     #region Fields
 
-    //Declare the each end time
+    //Declare the each month's end time
     private static float janEndTime;
     private static float febEndTime;
     private static float marEndTime;
@@ -22,8 +20,7 @@ public static class infectedDataBase
     private static float novEndTime;
     private static float decEndTime;
 
-    //
-    private static float dayTime = 1.0f; // GameManager.adjTimescale; Need to replace the valiable Kawasaki-san made.
+    private static float dayTime = 1.0f; //1day in Unity = 1sec in real
 
     //Declare the number of new patients of each month
     private static float newInfectorOfJan;
@@ -46,8 +43,7 @@ public static class infectedDataBase
 
     //Initialize the dictionary
     static infectedDataBase()
-    {
-        Debug.Log("CALL!!!!!!!!!!!!!");
+    {        
         infectionNumDictionary = new Dictionary<string, float>();
         infectionNumDictionary.Add("January", 0);
         infectionNumDictionary.Add("February", 0);
@@ -76,7 +72,7 @@ public static class infectedDataBase
 
     #region Methods
 
-    //Set the milestome to the end of each month
+    //Set the end of each month
     private static void MonthSetting()
     {
         janEndTime = dayTime * DateTime.DaysInMonth(2021, 1);
@@ -92,92 +88,80 @@ public static class infectedDataBase
         novEndTime = octEndTime + dayTime * DateTime.DaysInMonth(2021, 11);
         decEndTime = novEndTime + dayTime * DateTime.DaysInMonth(2021, 12);
     }
-    
-    //Count  patients
+
+    //Count  patients of each month
     public static void MonthlyNewInfector(float beInfectionNegativeTime)
-    {  
+    {
         if (beInfectionNegativeTime <= janEndTime)
         {
             newInfectorOfJan++;
             infectionNumDictionary["January"] = newInfectorOfJan;
-            Debug.Log("Jan" + newInfectorOfJan);
         }
 
-        else if (beInfectionNegativeTime <= febEndTime) 
-        { 
+        else if (beInfectionNegativeTime <= febEndTime)
+        {
             newInfectorOfFeb++;
             infectionNumDictionary["February"] = newInfectorOfFeb;
-            Debug.Log("Feb" + newInfectorOfFeb);
         }
 
         else if (beInfectionNegativeTime <= marEndTime)
         {
             newInfectorOfMar++;
             infectionNumDictionary["March"] = newInfectorOfMar;
-            Debug.Log("Mar" + newInfectorOfMar);
         }
 
         else if (beInfectionNegativeTime <= aprEndTime)
         {
             newInfectorOfApr++;
             infectionNumDictionary["April"] = newInfectorOfApr;
-            Debug.Log("Apr" + newInfectorOfApr);
         }
 
-        else if (beInfectionNegativeTime <= mayEndTime) 
+        else if (beInfectionNegativeTime <= mayEndTime)
         {
             newInfectorOfMay++;
             infectionNumDictionary["May"] = newInfectorOfMay;
-            Debug.Log("May" + newInfectorOfMay);
         }
 
         else if (beInfectionNegativeTime <= junEndTime)
         {
             newInfectorOfJun++;
             infectionNumDictionary["June"] = newInfectorOfJun;
-            Debug.Log("Jun" + newInfectorOfJun);
         }
 
-        else if (beInfectionNegativeTime <= julEndTime) 
+        else if (beInfectionNegativeTime <= julEndTime)
         {
-            newInfectorOfJul++; 
+            newInfectorOfJul++;
             infectionNumDictionary["July"] = newInfectorOfJul;
-            Debug.Log("Jul" + newInfectorOfJul);
         }
 
         else if (beInfectionNegativeTime <= augEndTime)
         {
             newInfectorOfAug++;
             infectionNumDictionary["August"] = newInfectorOfAug;
-            Debug.Log("Aug" + newInfectorOfAug);
         }
 
-        else if (beInfectionNegativeTime <= sepEndTime) 
+        else if (beInfectionNegativeTime <= sepEndTime)
         {
             newInfectorOfSep++;
             infectionNumDictionary["September"] = newInfectorOfSep;
-            Debug.Log("Sep" + newInfectorOfSep);
         }
 
         else if (beInfectionNegativeTime <= octEndTime)
         {
             newInfectorOfOct++;
             infectionNumDictionary["Octorber"] = newInfectorOfOct;
-            Debug.Log("Oct" + newInfectorOfOct);
         }
 
-        else if (beInfectionNegativeTime <= novEndTime) 
+        else if (beInfectionNegativeTime <= novEndTime)
         {
-            newInfectorOfNov++; 
+            newInfectorOfNov++;
             infectionNumDictionary["Novenmber"] = newInfectorOfNov;
-            Debug.Log("Nov" + newInfectorOfNov);
         }
 
         else if (beInfectionNegativeTime <= decEndTime)
         {
             newInfectorOfDec++;
             infectionNumDictionary["December"] = newInfectorOfDec;
-            Debug.Log("Dec" + newInfectorOfDec);
         }
     }
 }
