@@ -1,4 +1,7 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 [System.Serializable]
@@ -30,23 +33,25 @@ public class Destination
 
 public class DestinationManager : MonoBehaviour
 {
-    [SerializeField]
-    private GameObject stageObj;
+    //[SerializeField]
+    //private GameObject stageObj;
 
-    [SerializeField]
-    private GameObject destinationObj;
+    //[SerializeField]
+    //private GameObject destinationObj;
 
-    [SerializeField]
-    private float circleRatio = 0.8f;
+    //[SerializeField]
+    //private Color destinationColor = Color.gray;
 
-    [SerializeField]
-    private Color destinationColor = Color.gray;
+    //[SerializeField]
+    //private float circleRatio = 0.8f;
 
-    public int MaximumNumberOfDestinations = 10;
+    //[SerializeField]
+    //private int MaximumNumberOfDestinations = 10;
+
+    //private float radius;
 
     [SerializeField]
     private List<Destination> destinationList = new List<Destination>();
-    private float radius;
 
     public List<Destination> DestinationList
     {
@@ -55,41 +60,55 @@ public class DestinationManager : MonoBehaviour
 
     private void Awake()
     {
-        float xSize = stageObj.GetComponent<Renderer>().bounds.size.x;
-        float zSize = stageObj.GetComponent<Renderer>().bounds.size.z;
-        float diameter = xSize < zSize ? xSize * circleRatio : zSize * circleRatio;
-        radius = diameter / 2;
+        //DeployCirclePosition();
 
-        for (int i = 0; i < MaximumNumberOfDestinations; i++)
+        DeployManualPosition();
+    }
+
+    //set destination manualy
+    private void DeployManualPosition()
+    {
+        var destinationObjects = GameObject.FindGameObjectsWithTag("Destination");
+
+        for(int i=0; i< destinationObjects.Length; i++)
         {
-            Destination destination = new Destination(i, SetCirclePosition(i));
+            Destination destination = new Destination(i,destinationObjects[i].transform.position);
             destinationList.Add(destination);
         }
     }
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        foreach(Destination destination in destinationList)
-        {
-            GameObject obj = Instantiate(
-                destinationObj, 
-                destination.Position, 
-                destinationObj.transform.rotation,
-                transform);
-            obj.GetComponent<Renderer>().material.color = destinationColor;
-        }
-    }
+    //private void DeployCirclePosition()
+    //{
+    //    float xSize = stageObj.GetComponent<Renderer>().bounds.size.x;
+    //    float zSize = stageObj.GetComponent<Renderer>().bounds.size.z;
+    //    float diameter = xSize < zSize ? xSize * circleRatio : zSize * circleRatio;
+    //    radius = diameter / 2;
 
-    // set destination on a circle
-    private Vector3 SetCirclePosition(int currentNum)
-    {
-        int maxNum = MaximumNumberOfDestinations;
-        var x = radius * Mathf.Cos(2 * Mathf.PI * currentNum / maxNum);
-        var z = radius * Mathf.Sin(2 * Mathf.PI * currentNum / maxNum);
+    //    for (int i = 0; i < MaximumNumberOfDestinations; i++)
+    //    {
+    //        Destination destination = new Destination(i, GetCirclePosition(i));
+    //        destinationList.Add(destination);
+    //    }
 
-        return new Vector3(x, 0, z);
-    }
+    //    foreach (Destination destination in destinationList)
+    //    {
+    //        GameObject obj = Instantiate(
+    //            destinationObj,
+    //            destination.Position,
+    //            destinationObj.transform.rotation,
+    //            transform);
+    //        obj.GetComponent<Renderer>().material.color = destinationColor;
+    //    }
+    //}
 
-    //TODO set destination manualy
+    //// set destination on a circle
+    //private Vector3 GetCirclePosition(int currentNum)
+    //{
+    //    int maxNum = MaximumNumberOfDestinations;
+    //    var x = radius * Mathf.Cos(2 * Mathf.PI * currentNum / maxNum);
+    //    var z = radius * Mathf.Sin(2 * Mathf.PI * currentNum / maxNum);
+
+    //    return new Vector3(x, 0, z);
+    //}
+
 }
