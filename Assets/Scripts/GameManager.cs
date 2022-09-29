@@ -424,27 +424,26 @@ public class GameManager : MonoBehaviour
         simTime = float.Parse(simTimeInput.GetComponent<InputField>().text.ToString());
     }
 
-private void UpdateCursorLock()
-{
-    if (Input.GetKeyDown(KeyCode.Escape))
+    //CurorLock When PlayerMode
+    private void UpdateCursorLock()
     {
-        isCursorlock = false;
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            isCursorlock = false;
+        }
+        else if (Input.GetMouseButton(0))
+        {
+            isCursorlock = true;
+        }
+        if (isCursorlock)
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+        }
+        else if (!isCursorlock)
+        {
+            Cursor.lockState = CursorLockMode.None;
+        }
     }
-    else if (Input.GetMouseButton(0))
-    {
-        isCursorlock = true;
-    }
-
-    if (isCursorlock)
-    {
-        Cursor.lockState = CursorLockMode.Locked;
-    }
-    else if (!isCursorlock)
-    {
-        Cursor.lockState = CursorLockMode.None;
-    }
-}
-
 
     //For debug
     private void debugCount()
