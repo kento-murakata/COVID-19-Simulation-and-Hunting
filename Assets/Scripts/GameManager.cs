@@ -53,6 +53,7 @@ public class GameManager : MonoBehaviour
     public InputField ratioInput;
     public InputField simTimeInput;
     public Button startSim;
+    public bool isCloneEnd = false;
 
     public List<GameObject> PersonList { get; set; }
 
@@ -64,6 +65,7 @@ public class GameManager : MonoBehaviour
         //Time.timeScale = 0;
         //GameObject.Find("InputUI").SetActive(true);
         //startSim.onClick.AddListener(gameStart);
+        //isCloneEnd = true;
 
         GameObject.Find("InputUI").SetActive(false);
         initializeText();
@@ -88,10 +90,10 @@ public class GameManager : MonoBehaviour
         //    }
     }
 
-    private void FixedUpdate()
-    {
-        UpdateCursorLock();
-    }
+    //private void FixedUpdate()
+    //{
+    //    UpdateCursorLock();
+    //}
 
     /////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -116,7 +118,7 @@ public class GameManager : MonoBehaviour
             GameObject clonePersons = Instantiate(prefabs, appearPos, Quaternion.identity);
             clonePersons.GetComponent<HumanBehaviour>().ChangeHealthStatus(HealthStatus.negative);
             clonePersons.GetComponent<HumanBehaviour>().IsBehaviouralRestriction = false;
-            //clonePersons.GetComponent<HumanBehaviour>().isRestricted = false;
+            clonePersons.GetComponent<HumanBehaviour>().IsRestricted = false;
             clonePersons.GetComponent<HumanBehaviour>().IsFaceMask = randomBool();
 
             ////release after hirano san pull
@@ -132,8 +134,6 @@ public class GameManager : MonoBehaviour
             //        clonePersons.GetComponent<HumanBehaviour>().DetectRadius = detectRadius*maskEffect;
             //        break;
             //}
-
-
             personList.Add(clonePersons);
         }
         for (int i = 0; i < (amount - Mathf.Ceil(amount * ratio)); i++)
@@ -151,7 +151,7 @@ public class GameManager : MonoBehaviour
                     break;
             }
             clonePersons.GetComponent<HumanBehaviour>().IsBehaviouralRestriction = false;
-            //clonePersons.GetComponent<HumanBehaviour>().isRestricted = false;
+            clonePersons.GetComponent<HumanBehaviour>().IsRestricted = false;
             clonePersons.GetComponent<HumanBehaviour>().IsFaceMask = randomBool();
             ////release after hirano san pull
             //int maskStatus = Random.Range(0, 2);
@@ -166,7 +166,6 @@ public class GameManager : MonoBehaviour
             //        clonePersons.GetComponent<HumanBehaviour>().DetectRadius = detectRadius * maskEffect;
             //        break;
             //}
-
             personList.Add(clonePersons);
         }
     }
@@ -252,7 +251,7 @@ public class GameManager : MonoBehaviour
         else
         {
             simCount = 0;
-            SceneManager.LoadScene("Graphic");
+            Time.timeScale=0;
         }
     }
 
@@ -262,28 +261,44 @@ public class GameManager : MonoBehaviour
     //    for (int i = 0; i < personList.Count; i++)
     //    {
     //        if (personList[i].GetComponent<HumanBehaviour>().healthStatus == HealthStatus.onsetAndQuarantine
-    //            && personList[i].GetComponent<HumanBehaviour>().isRestricted==0)
+    //            && personList[i].GetComponent<HumanBehaviour>().IsRestricted==0)
     //        {
     //            personList[i].transform.position = new Vector3(-300, -25, 30);
-    //            personList[i].GetComponent<HumanBehaviour>().isRestricted == 1;
-    //            personList[i].GetComponent<HumanBehaviour>().MoveDuration =0;
+    //            personList[i].GetComponent<HumanBehaviour>().IsRestricted == 1;
+    //            personList[i].GetComponent<HumanBehaviour>().DetectRadius =0;
 
     //        }
     //    }
     //}
 
     //Return Stage4Instance
-    //private void returnStage4Instance() 
+    //private void returnStage4Instance()
     //{
     //    for (int i = 0; i < personList.Count; i++)
     //    {
     //        if (personList[i].GetComponent<HumanBehaviour>().healthStatus == HealthStatus.infectionNegative
-    //            && personList[i].GetComponent<HumanBehaviour>().isRestricted == 1)
+    //            && personList[i].GetComponent<HumanBehaviour>().IsRestricted == 1)
     //        {
     //            personList[i].transform.position = LocationDeter();
-    //            personList[i].GetComponent<HumanBehaviour>().isRestricted == 0;
-    //            //To change the moveduration if policyB is applied
-    //            personList[i].GetComponent<HumanBehaviour>().MoveDuration = moveDuration;
+    //            personList[i].GetComponent<HumanBehaviour>().IsRestricted = 0;
+    //            if (GameObject.Find("PolicyA").GetComponent<ButtonManager>().isPolicyAClick == true)
+    //            {
+    //               personList[i].GetComponent<HumanBehaviour>().IsFaceMask = true;
+    //               personList[i].GetComponent<HumanBehaviour>().DetectRadius = detectRadius * maskEffect;
+    //            }
+    //            else
+    //            {
+    //               personList[i].GetComponent<HumanBehaviour>().IsFaceMask = false;
+    //                personList[i].GetComponent<HumanBehaviour>().DetectRadius = detectRadius;
+    //            }
+    //            if (GameObject.Find("PolicyB").GetComponent <ButtonManager>().isPolicyBClick ==true)
+    //            {
+    //               personList[i].GetComponent<HumanBehaviour>().IsBehaviouralRestriction = true;
+    //            }
+    //            else 
+    //            {
+    //               personList[i].GetComponent<HumanBehaviour>().IsBehaviouralRestriction = false;
+    //            }
     //        }
     //    }
     //}
@@ -316,6 +331,8 @@ public class GameManager : MonoBehaviour
     }
 
     //Apply the Policy
+    //Apply the Policy only in the plane
+    //Need to be modified
     public void applyPolicy(covidpolicy policy)
     {
         switch (policy)
@@ -323,8 +340,10 @@ public class GameManager : MonoBehaviour
             case covidpolicy.PolicyA:
                 for (int i = 0; i < personList.Count; i++)
                 {
+                    Debug.Log(personList[i].GetComponent<HumanBehaviour>().DetectRadius);
                     personList[i].GetComponent<HumanBehaviour>().IsFaceMask = true;
-                    //personList[i].GetComponent<HumanBehaviour>().DetectRadius = detectRadius * maskEffect;
+                    personList[i].GetComponent<HumanBehaviour>().DetectRadius = detectRadius * maskEffect;
+                    Debug.Log(personList[i].GetComponent<HumanBehaviour>().DetectRadius);
                 }
                 checkPolicy(covidpolicy.PolicyA);
                 break;
@@ -340,7 +359,6 @@ public class GameManager : MonoBehaviour
         }
     }
 
-
     //Reset Policy
     public void resetPolicy(covidpolicy policy) 
     {
@@ -350,19 +368,18 @@ public class GameManager : MonoBehaviour
                 for (int i = 0; i < personList.Count; i++)
                 {
                     personList[i].GetComponent<HumanBehaviour>().IsFaceMask = randomBool();
-                    ////release after hirano san pull
-                    //int maskStatus = Random.Range(0, 2);
-                    //switch (maskStatus)
-                    //{
-                    //    case 0:
-                    //        personList[i].GetComponent<HumanBehaviour>().IsFaceMask = false;
-                    //        personList[i].GetComponent<HumanBehaviour>().DetectRadius = detectRadius;
-                    //        break;
-                    //    case 1:
-                    //        personList[i].GetComponent<HumanBehaviour>().IsFaceMask = true;
-                    //        personList[i].GetComponent<HumanBehaviour>().DetectRadius = detectRadius * maskEffect;
-                    //        break;
-                    //}
+                    int maskStatus = Random.Range(0, 2);
+                    switch (maskStatus)
+                    {
+                        case 0:
+                            personList[i].GetComponent<HumanBehaviour>().IsFaceMask = false;
+                            personList[i].GetComponent<HumanBehaviour>().DetectRadius = detectRadius;
+                            break;
+                        case 1:
+                            personList[i].GetComponent<HumanBehaviour>().IsFaceMask = true;
+                            personList[i].GetComponent<HumanBehaviour>().DetectRadius = detectRadius * maskEffect;
+                            break;
+                    }
                 }
                 checkPolicy(covidpolicy.PolicyA);
                 break;
@@ -390,7 +407,7 @@ public class GameManager : MonoBehaviour
             data.healthstatus = (personList[i].GetComponent<HumanBehaviour>().healthStatus).ToString();
             data.IsFaceMask = personList[i].GetComponent<HumanBehaviour>().IsFaceMask;
             data.IsBehaviouralRestriction = personList[i].GetComponent<HumanBehaviour>().IsBehaviouralRestriction;
-            //data.isRestricted= personList[i].GetComponent<HumanBehaviour>().isRestricted;
+            data.IsRestricted = personList[i].GetComponent<HumanBehaviour>().IsRestricted;
             string json = JsonUtility.ToJson(data);
             writer.WriteLine(json);
         }
@@ -407,27 +424,26 @@ public class GameManager : MonoBehaviour
         simTime = float.Parse(simTimeInput.GetComponent<InputField>().text.ToString());
     }
 
-private void UpdateCursorLock()
-{
-    if (Input.GetKeyDown(KeyCode.Escape))
+    //CurorLock When PlayerMode
+    private void UpdateCursorLock()
     {
-        isCursorlock = false;
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            isCursorlock = false;
+        }
+        else if (Input.GetMouseButton(0))
+        {
+            isCursorlock = true;
+        }
+        if (isCursorlock)
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+        }
+        else if (!isCursorlock)
+        {
+            Cursor.lockState = CursorLockMode.None;
+        }
     }
-    else if (Input.GetMouseButton(0))
-    {
-        isCursorlock = true;
-    }
-
-    if (isCursorlock)
-    {
-        Cursor.lockState = CursorLockMode.Locked;
-    }
-    else if (!isCursorlock)
-    {
-        Cursor.lockState = CursorLockMode.None;
-    }
-}
-
 
     //For debug
     private void debugCount()
