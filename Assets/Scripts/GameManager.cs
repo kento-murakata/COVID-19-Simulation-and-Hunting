@@ -90,7 +90,7 @@ public class GameManager : MonoBehaviour
 
     private void FixedUpdate()
     {
-        UpdateCursorLock();
+        //UpdateCursorLock();
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////
