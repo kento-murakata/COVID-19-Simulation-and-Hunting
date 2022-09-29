@@ -6,20 +6,19 @@ using UnityEngine.UI;
 
 public class ButtonManager : MonoBehaviour
 {
+    #region field
+
     private bool isPolicyAClick = false;
     private bool isPolicyBClick = false;
     private bool isPauseResumClick = false;
 
-    //Creat ScenceChange Button
-    public void onScenceChangeClick()
-    {
-        //SceneManager.LoadScene("Graphic");
-    }
+    #endregion
+
+    #region method
 
     //Creat dataoutput Button
     public void onDataClick()
     {
-        Debug.Log("DataOutput!!");
         GameObject.Find("GameManager").GetComponent<GameManager>().dataOutput("testfile");
     }
 
@@ -101,15 +100,14 @@ public class ButtonManager : MonoBehaviour
     //Creat Graphic Button
     public void onGraphicClick()
     {
-        //Graph.MakeGraph();
-        Debug.Log("Graphic Out!!");
+        Graph.MakeGraph();
     }
 
     //Creat Close Graphic Button
     public void onCloseGraphicClick()
     {
-        //Graph.onCloseGraphClick();
+        Graph.onCloseGraphClick();
     }
-
+    #endregion
 
 }
