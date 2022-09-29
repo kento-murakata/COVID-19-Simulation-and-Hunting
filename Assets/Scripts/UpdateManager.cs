@@ -11,7 +11,7 @@ public class UpdateManager : MonoBehaviour
 
     public void toStart()
     {
-        array = list.ToArray();
+        array = list.ToArray() ;
     }
 
     //Update is called once per frame
