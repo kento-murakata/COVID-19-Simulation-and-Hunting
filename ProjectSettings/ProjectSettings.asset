@@ -4,7 +4,7 @@
 PlayerSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 23
-  productGUID: 00000000000000000000000000000000
+  productGUID: c396c4ce1940cbd40ad6b1d3714f60f2
   AndroidProfiler: 0
   AndroidFilterTouchesWhenObscured: 0
   AndroidEnableSustainedPerformanceMode: 0
@@ -590,6 +590,7 @@ PlayerSettings:
     : UNITY_POST_PROCESSING_STACK_V2;PROBUILDER_FBX_ENABLED
     Android: UNITY_POST_PROCESSING_STACK_V2;PROBUILDER_FBX_ENABLED
     CloudRendering: UNITY_POST_PROCESSING_STACK_V2
+    EmbeddedLinux: UNITY_POST_PROCESSING_STACK_V2
     GameCoreXboxOne: UNITY_POST_PROCESSING_STACK_V2
     Lumin: UNITY_POST_PROCESSING_STACK_V2
     Nintendo Switch: UNITY_POST_PROCESSING_STACK_V2;PROBUILDER_FBX_ENABLED
@@ -696,7 +697,7 @@ PlayerSettings:
   cloudProjectId: d21f59b0-415b-46d9-9df8-44c448039b19
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: Platformer3DClient
+  projectName: Infection Simulator
   organizationId: unity_fea9d1904b8c71dcc73c
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 1
