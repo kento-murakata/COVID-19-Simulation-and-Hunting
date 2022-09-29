@@ -8,9 +8,10 @@ public class ButtonManager : MonoBehaviour
 {
     #region field
 
-    private bool isPolicyAClick = false;
-    private bool isPolicyBClick = false;
+    public bool isPolicyAClick = false;
+    public bool isPolicyBClick = false;
     private bool isPauseResumClick = false;
+    private bool isFastForwardClick = false;
 
     #endregion
 
@@ -73,7 +74,6 @@ public class ButtonManager : MonoBehaviour
     {
         if (isPauseResumClick == false)
         {
-            Debug.Log("Pause!");
             Time.timeScale = 0;
             GameObject.Find("Pause&ResumButton").GetComponent<Image>().color = Color.black;
             GameObject.Find("T_Pause&Resum").GetComponent<Text>().color = Color.white;
@@ -82,13 +82,41 @@ public class ButtonManager : MonoBehaviour
         }
         else
         {
-            Debug.Log("Resum!!");
             Time.timeScale = 1;
             GameObject.Find("Pause&ResumButton").GetComponent<Image>().color = Color.white;
             GameObject.Find("T_Pause&Resum").GetComponent<Text>().color = Color.black;
-            GameObject.Find("T_Pause&Resum").GetComponent<Text>().text = "Pasue";
+            GameObject.Find("T_Pause&Resum").GetComponent<Text>().text = "Pause";
             isPauseResumClick = false;
         }
+    }
+
+    //Creat FastForward Button
+    public void onFastForwardClick()
+    {
+        if (isFastForwardClick == false)
+        {
+            Time.fixedDeltaTime = 0.01f;
+            Time.timeScale =10;
+            GameObject.Find("FastForwardButton").GetComponent<Image>().color = Color.black;
+            GameObject.Find("T_FastForward").GetComponent<Text>().color = Color.white;
+            GameObject.Find("T_FastForward").GetComponent<Text>().text = "Stop";
+            isFastForwardClick = true;
+        }
+        else
+        {
+            Time.fixedDeltaTime = 0.02f;
+            Time.timeScale = 1;
+            GameObject.Find("FastForwardButton").GetComponent<Image>().color = Color.white;
+            GameObject.Find("T_FastForward").GetComponent<Text>().color = Color.black;
+            GameObject.Find("T_FastForward").GetComponent<Text>().text = ">>";
+            isFastForwardClick = false;
+        }
+    }
+
+    //Creat ExitButton
+    public void onExitClick()
+    {
+        Application.Quit();
     }
 
     //Creat PolicyC Button
