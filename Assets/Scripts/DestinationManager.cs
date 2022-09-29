@@ -33,22 +33,22 @@ public class Destination
 
 public class DestinationManager : MonoBehaviour
 {
-    //[SerializeField]
-    //private GameObject stageObj;
+    [SerializeField]
+    private GameObject stageObj;
 
-    //[SerializeField]
-    //private GameObject destinationObj;
+    [SerializeField]
+    private GameObject destinationObj;
 
-    //[SerializeField]
-    //private Color destinationColor = Color.gray;
+    [SerializeField]
+    private Color destinationColor = Color.gray;
 
-    //[SerializeField]
-    //private float circleRatio = 0.8f;
+    [SerializeField]
+    private float circleRatio = 0.8f;
 
-    //[SerializeField]
-    //private int MaximumNumberOfDestinations = 10;
+    [SerializeField]
+    private int MaximumNumberOfDestinations = 10;
 
-    //private float radius;
+    private float radius;
 
     [SerializeField]
     private List<Destination> destinationList = new List<Destination>();
@@ -58,11 +58,19 @@ public class DestinationManager : MonoBehaviour
         get { return destinationList; }
     }
 
+    [SerializeField]
+    private bool isNYmap = false;
+
     private void Awake()
     {
-        //DeployCirclePosition();
-
-        DeployManualPosition();
+        if (isNYmap)
+        {
+            DeployManualPosition();
+        }
+        else
+        {
+            DeployCirclePosition();
+        }
     }
 
     //set destination manualy
@@ -77,38 +85,38 @@ public class DestinationManager : MonoBehaviour
         }
     }
 
-    //private void DeployCirclePosition()
-    //{
-    //    float xSize = stageObj.GetComponent<Renderer>().bounds.size.x;
-    //    float zSize = stageObj.GetComponent<Renderer>().bounds.size.z;
-    //    float diameter = xSize < zSize ? xSize * circleRatio : zSize * circleRatio;
-    //    radius = diameter / 2;
+    private void DeployCirclePosition()
+    {
+        float xSize = stageObj.GetComponent<Renderer>().bounds.size.x;
+        float zSize = stageObj.GetComponent<Renderer>().bounds.size.z;
+        float diameter = xSize < zSize ? xSize * circleRatio : zSize * circleRatio;
+        radius = diameter / 2;
 
-    //    for (int i = 0; i < MaximumNumberOfDestinations; i++)
-    //    {
-    //        Destination destination = new Destination(i, GetCirclePosition(i));
-    //        destinationList.Add(destination);
-    //    }
+        for (int i = 0; i < MaximumNumberOfDestinations; i++)
+        {
+            Destination destination = new Destination(i, GetCirclePosition(i));
+            destinationList.Add(destination);
+        }
 
-    //    foreach (Destination destination in destinationList)
-    //    {
-    //        GameObject obj = Instantiate(
-    //            destinationObj,
-    //            destination.Position,
-    //            destinationObj.transform.rotation,
-    //            transform);
-    //        obj.GetComponent<Renderer>().material.color = destinationColor;
-    //    }
-    //}
+        foreach (Destination destination in destinationList)
+        {
+            GameObject obj = Instantiate(
+                destinationObj,
+                destination.Position,
+                destinationObj.transform.rotation,
+                transform);
+            obj.GetComponent<Renderer>().material.color = destinationColor;
+        }
+    }
 
-    //// set destination on a circle
-    //private Vector3 GetCirclePosition(int currentNum)
-    //{
-    //    int maxNum = MaximumNumberOfDestinations;
-    //    var x = radius * Mathf.Cos(2 * Mathf.PI * currentNum / maxNum);
-    //    var z = radius * Mathf.Sin(2 * Mathf.PI * currentNum / maxNum);
+    // set destination on a circle
+    private Vector3 GetCirclePosition(int currentNum)
+    {
+        int maxNum = MaximumNumberOfDestinations;
+        var x = radius * Mathf.Cos(2 * Mathf.PI * currentNum / maxNum);
+        var z = radius * Mathf.Sin(2 * Mathf.PI * currentNum / maxNum);
 
-    //    return new Vector3(x, 0, z);
-    //}
+        return new Vector3(x, 0, z);
+    }
 
 }
