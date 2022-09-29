@@ -9,13 +9,13 @@ public class UpdateManager : MonoBehaviour
 
     private HumanBehaviour[] array;
 
-    private void Start()
+    public void toStart()
     {
         array = list.ToArray();
     }
 
     //Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         var count = array.Length;
         for (var i = 0; i < count; i++)

@@ -62,22 +62,26 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
 
-        //Time.timeScale = 0;
-        //GameObject.Find("InputUI").SetActive(true);
-        //startSim.onClick.AddListener(gameStart);
-        //isCloneEnd = true;
+        Time.timeScale = 0;
+        GameObject.Find("InputUI").SetActive(true);
+        startSim.onClick.AddListener(gameStart);
+        isCloneEnd = true;
 
-        GameObject.Find("InputUI").SetActive(false);
-        initializeText();
-        personClone(prefabs, amount, ratioOfHealth);
-        checkPolicy(covidpolicy.PolicyA);
-        checkPolicy(covidpolicy.PolicyB);
+        //GameObject.Find("InputUI").SetActive(false);
+        //initializeText();
+        //personClone(prefabs, amount, ratioOfHealth);
+        //checkPolicy(covidpolicy.PolicyA);
+        //checkPolicy(covidpolicy.PolicyB);
     }
 
     private void Update()
     {
         updateText();
         checkSimTime();
+        if (ratio >= 1&& (stage4Num==amount)) 
+        {
+            Time.timeScale = 0;
+        }
         //    if (checkTime >= 1)
         //    {
         //        checkStage4Instance();
@@ -103,6 +107,7 @@ public class GameManager : MonoBehaviour
             updateInput();
             initializeText();
             personClone(prefabs, amount, ratioOfHealth);
+        GameObject.Find("UpdateManager").GetComponent<UpdateManager>().toStart();
             checkPolicy(covidpolicy.PolicyA);
             checkPolicy(covidpolicy.PolicyB);
             Time.timeScale = 1;
