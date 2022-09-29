@@ -317,6 +317,12 @@ public class GameManager : MonoBehaviour
             textForPercentage.color = Color.red;
             textper.color = Color.red;
         }
+        else 
+        {
+            textForPercentage.color = Color.black;
+            textper.color = Color.black;
+        }
+
     }
 
     //Apply the Policy
