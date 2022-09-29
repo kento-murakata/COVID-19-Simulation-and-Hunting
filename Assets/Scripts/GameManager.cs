@@ -37,8 +37,8 @@ public class GameManager : MonoBehaviour
     //define control parameter
     private float simCount = 0;
     private List<GameObject> personList = new List<GameObject>();
-    private int stage1Num = 0;
-    private int stage2Num = 0;
+    //private int stage1Num = 0;
+    //private int stage2Num = 0;
     private int stage3Num = 0;
     private int stage4Num = 0;
     private float ratio = 0f;
