@@ -40,6 +40,12 @@ public class MyDestination : Destination
 
 public class HumanBehaviour : MonoBehaviour
 {
+    [SerializeField]
+    private int numberOfDestinations = 3;
+
+    [SerializeField]
+    private List<MyDestination> destinations = new List<MyDestination>();
+
     private GameManager gameManager;
     private DestinationManager destinationManager;
     private Infection infection;
@@ -48,25 +54,14 @@ public class HumanBehaviour : MonoBehaviour
     private HumanDetector m_detector;
     private Material m_bodyMaterial;
 
-    [SerializeField]
-    private int numberOfDestinations = 3;
-
-    [SerializeField]
-    private List<MyDestination> destinations = new List<MyDestination>();
-
     private HealthStatus currentHealthStatus;
-    private HealthStatus preHealthStatus;
-
-    private float healthPoint = 100;
-
     private BehavioralPattern currentBehavioralPattern;
     private MyDestination currentDestination;
 
-    private float detectRadius = 0.5f;
-    private float moveDuration = 5.0f;
+    private float healthPoint = 100;
 
-    [SerializeField]
-    private bool isBehaviouralRestriction = false;
+    private float detectRadius = 0.5f;
+
 
 
     //Distance to others (with/without mask)
@@ -82,22 +77,8 @@ public class HumanBehaviour : MonoBehaviour
         }
     }
 
-    //TODO detele
-    public bool IsFaceMask { get; set; }
-
-    //TODO detele
-    public float MoveDuration
-    {
-        get { return moveDuration; }
-        set { moveDuration = value; }
-    }
-
     //Behavioral restriction flag (when true, only basic behavior (going back and forth between home and work))
-    public bool IsBehaviouralRestriction
-    {
-        get { return isBehaviouralRestriction; }
-        set { isBehaviouralRestriction = value; }
-    }
+    public bool IsBehaviouralRestriction { get; set; }
 
     //Restriction flag
     public bool IsRestricted { get; set; }
@@ -112,6 +93,23 @@ public class HumanBehaviour : MonoBehaviour
     {
         get { return GetTargetDestinations(BehavioralPattern.fun); }
     }
+
+
+
+
+    //TODO detele
+    public bool IsFaceMask { get; set; }
+
+    //TODO detele
+    public float MoveDuration
+    {
+        get { return moveDuration; }
+        set { moveDuration = value; }
+    }
+
+    //TODO detele
+    private float moveDuration = 5.0f;
+
 
 
     private void Awake()
@@ -170,6 +168,12 @@ public class HumanBehaviour : MonoBehaviour
                     m_navMesh.SetDestination(currentDestination.Position);
                 }
             }
+        }
+
+        //When attacked by a player
+        if (other.transform.CompareTag("Player"))
+        {
+
         }
     }
 
@@ -332,8 +336,6 @@ public class HumanBehaviour : MonoBehaviour
                 m_bodyMaterial.color = gameManager.stage1Color;
                 break;
         }
-        preHealthStatus = currentHealthStatus;
-
     }
 
     //private void OnDrawGizmos()
