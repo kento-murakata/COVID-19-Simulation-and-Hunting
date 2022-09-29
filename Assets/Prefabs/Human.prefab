@@ -201,16 +201,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1159c0aa9a352b940988ed5734f42358, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  stageObj: {fileID: 82380577705194140, guid: c6782fd84b080334697a018adb5c9a33, type: 3}
-  initHealthStatus: 0
-  currentStatus: 0
-  moveDuration: 5
-  moveVelocity: 3.5
-  detectRadius: 0.5
-  faceMaskEffect: 2
-  collisionHoldingTime: 1
-  healthPoint: 100
-  directionColor: {r: 0, g: 0, b: 1, a: 1}
+  numberOfDestinations: 4
+  destinations: []
+  currentBehavioralPattern: 0
+  isBehaviouralRestriction: 0
 --- !u!114 &1700850413532853019
 MonoBehaviour:
   m_ObjectHideFlags: 0
