@@ -53,6 +53,8 @@ public class HumanBehaviour : MonoBehaviour
     private NavMeshAgent m_navMesh;
     private HumanDetector m_detector;
     private Material m_bodyMaterial;
+    private Rigidbody m_rbody;
+    private CapsuleCollider m_collider;
 
     private HealthStatus currentHealthStatus;
     private BehavioralPattern currentBehavioralPattern;
@@ -62,7 +64,8 @@ public class HumanBehaviour : MonoBehaviour
 
     private float detectRadius = 0.5f;
 
-
+    private bool isHit = false;
+    private bool isStatusChange = false;
 
     //Distance to others (with/without mask)
     public float DetectRadius
@@ -94,7 +97,7 @@ public class HumanBehaviour : MonoBehaviour
         get { return GetTargetDestinations(BehavioralPattern.fun); }
     }
 
-
+    public bool IsCure { get; set; } = true;
 
 
     //TODO detele
@@ -131,7 +134,6 @@ public class HumanBehaviour : MonoBehaviour
 
     public void UpdateMe()
     {
-        //TODO stop movement when IsRestricted is true
         SetDestination();
         CheckHealthStatus();
         ChangeBodyColor();
@@ -142,7 +144,7 @@ public class HumanBehaviour : MonoBehaviour
         //Change of course in the event of a collision between humans
         if (other.transform.CompareTag("Human") && gameObject != other.gameObject)
         {
-            if (!IsBehaviouralRestriction)
+            if (!IsBehaviouralRestriction & !isHit)
             {
                 var human_other = other.gameObject.GetComponent<HumanBehaviour>();
 
@@ -173,7 +175,14 @@ public class HumanBehaviour : MonoBehaviour
         //When attacked by a player
         if (other.transform.CompareTag("Player"))
         {
+            isHit = true;
+            isStatusChange = true;
+            m_navMesh.enabled = false;
+            m_rbody.isKinematic = false;
+            m_collider.isTrigger = false;
 
+            var direction = (transform.position - other.transform.position).normalized;
+            m_rbody.AddForce(direction * 20, ForceMode.Impulse);
         }
     }
 
@@ -195,6 +204,10 @@ public class HumanBehaviour : MonoBehaviour
         infection = gameObject.GetComponent<Infection>();
 
         m_bodyMaterial = GetComponent<Renderer>().material;
+
+        m_rbody = GetComponent<Rigidbody>();
+
+        m_collider = GetComponent<CapsuleCollider>();
     }
 
     private void SetDestinations()
@@ -242,7 +255,7 @@ public class HumanBehaviour : MonoBehaviour
 
     private void SetDestination()
     {
-        if (m_navMesh != null)
+        if (m_navMesh != null && !IsRestricted && !isHit)
         {
             //If no destination is set, or if a destination is reached, the next destination is set
             if (m_navMesh.hasPath && m_navMesh.remainingDistance < 2.1f)
@@ -307,7 +320,46 @@ public class HumanBehaviour : MonoBehaviour
 
     private void CheckHealthStatus()
     {
-        currentHealthStatus = infection.Test(this, m_detector.ContactHumans);
+        if (!isHit)
+        {
+            currentHealthStatus = infection.Test(this, m_detector.ContactHumans);
+        }
+        else
+        {
+            if (isStatusChange)
+            {
+                if (IsCure)
+                {
+                    if (healthStatus != HealthStatus.negative)
+                    {
+                        currentHealthStatus = HealthStatus.negative;
+                    }
+                    else
+                    {
+                        currentHealthStatus = HealthStatus.infectionNegative;
+                    }
+                }
+                else
+                {
+                    if (healthStatus != HealthStatus.negative)
+                    {
+                        currentHealthStatus = HealthStatus.onsetAndQuarantine;
+                    }
+
+                }
+
+                isStatusChange = false;
+            }
+
+
+            if (m_rbody.IsSleeping())
+            {
+                isHit = false;
+                m_navMesh.enabled = true;
+                m_rbody.isKinematic = true;
+                m_collider.isTrigger = true;
+            }
+        }
     }
 
     public void ChangeHealthStatus(HealthStatus status)

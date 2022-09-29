@@ -1,4 +1,7 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 [System.Serializable]
@@ -37,23 +40,52 @@ public class DestinationManager : MonoBehaviour
     private GameObject destinationObj;
 
     [SerializeField]
+    private Color destinationColor = Color.gray;
+
+    [SerializeField]
     private float circleRatio = 0.8f;
 
     [SerializeField]
-    private Color destinationColor = Color.gray;
+    private int MaximumNumberOfDestinations = 10;
 
-    public int MaximumNumberOfDestinations = 10;
+    private float radius;
 
     [SerializeField]
     private List<Destination> destinationList = new List<Destination>();
-    private float radius;
 
     public List<Destination> DestinationList
     {
         get { return destinationList; }
     }
 
+    [SerializeField]
+    private bool isNYmap = false;
+
     private void Awake()
+    {
+        if (isNYmap)
+        {
+            DeployManualPosition();
+        }
+        else
+        {
+            DeployCirclePosition();
+        }
+    }
+
+    //set destination manualy
+    private void DeployManualPosition()
+    {
+        var destinationObjects = GameObject.FindGameObjectsWithTag("Destination");
+
+        for(int i=0; i< destinationObjects.Length; i++)
+        {
+            Destination destination = new Destination(i,destinationObjects[i].transform.position);
+            destinationList.Add(destination);
+        }
+    }
+
+    private void DeployCirclePosition()
     {
         float xSize = stageObj.GetComponent<Renderer>().bounds.size.x;
         float zSize = stageObj.GetComponent<Renderer>().bounds.size.z;
@@ -62,19 +94,15 @@ public class DestinationManager : MonoBehaviour
 
         for (int i = 0; i < MaximumNumberOfDestinations; i++)
         {
-            Destination destination = new Destination(i, SetCirclePosition(i));
+            Destination destination = new Destination(i, GetCirclePosition(i));
             destinationList.Add(destination);
         }
-    }
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        foreach(Destination destination in destinationList)
+        foreach (Destination destination in destinationList)
         {
             GameObject obj = Instantiate(
-                destinationObj, 
-                destination.Position, 
+                destinationObj,
+                destination.Position,
                 destinationObj.transform.rotation,
                 transform);
             obj.GetComponent<Renderer>().material.color = destinationColor;
@@ -82,7 +110,7 @@ public class DestinationManager : MonoBehaviour
     }
 
     // set destination on a circle
-    private Vector3 SetCirclePosition(int currentNum)
+    private Vector3 GetCirclePosition(int currentNum)
     {
         int maxNum = MaximumNumberOfDestinations;
         var x = radius * Mathf.Cos(2 * Mathf.PI * currentNum / maxNum);
@@ -91,5 +119,4 @@ public class DestinationManager : MonoBehaviour
         return new Vector3(x, 0, z);
     }
 
-    //TODO set destination manualy
 }
