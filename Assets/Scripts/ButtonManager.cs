@@ -122,7 +122,9 @@ public class ButtonManager : MonoBehaviour
     //Creat PolicyC Button
     public void onPolicyCClick()
     {
-        Debug.Log("PolicyC!!");
+        Debug.Log("PolicyC:");
+        GameObject.Find("GameManager").GetComponent<GameManager>().gm_Player.SetActive(true);
+        GameObject.Find("GameManager").GetComponent<GameManager>().gm_NYBlock01.SetActive(true);
     }
 
     //Creat Graphic Button
