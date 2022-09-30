@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -55,6 +56,8 @@ public class HumanBehaviour : MonoBehaviour
     private Material m_bodyMaterial;
     private Rigidbody m_rbody;
     private CapsuleCollider m_collider;
+    private NavMeshHit navHit = new NavMeshHit();
+    private Coroutine coroutine;
 
     private HealthStatus currentHealthStatus;
     private BehavioralPattern currentBehavioralPattern;
@@ -121,13 +124,13 @@ public class HumanBehaviour : MonoBehaviour
 
         UpdateManager updateManager = GameObject.Find("UpdateManager").GetComponent<UpdateManager>();
         updateManager.list.Add(this);
-
-        //Select a specified number of destinations randomly from the destination list
-        SetDestinations();
     }
 
     private void Start()
     {
+        //Select a specified number of destinations randomly from the destination list
+        SetDestinations();
+
         //get nearest destination
         GetTargetDestinations(BehavioralPattern.home);
     }
@@ -185,6 +188,16 @@ public class HumanBehaviour : MonoBehaviour
             m_rbody.AddForce(direction * 20, ForceMode.Impulse);
         }
     }
+
+    //private void OnEnable()
+    //{
+    //    coroutine = StartCoroutine(SetDestination());
+    //}
+
+    //void OnDisable()
+    //{
+    //    StopCoroutine(coroutine);
+    //}
 
     private void GetComponents()
     {
@@ -255,33 +268,56 @@ public class HumanBehaviour : MonoBehaviour
 
     private void SetDestination()
     {
-        if (m_navMesh != null && !IsRestricted && !isHit)
+        if (m_navMesh != null)
         {
-            //If no destination is set, or if a destination is reached, the next destination is set
-            if (m_navMesh.hasPath && m_navMesh.remainingDistance < 2.1f)
+            if (!m_navMesh.isOnNavMesh)
             {
-                m_navMesh.ResetPath();
 
-                // change destination
-                if (currentBehavioralPattern == BehavioralPattern.home)
-                {
-                    currentBehavioralPattern = BehavioralPattern.work;
-                }
-                else if (currentBehavioralPattern == BehavioralPattern.work)
-                {
-                    currentBehavioralPattern = BehavioralPattern.home;
-                }
-                else
-                {
-                    currentBehavioralPattern = BehavioralPattern.home;
-                }
+                //m_navMesh.updatePosition = false;
+                //m_rbody.isKinematic = false;
+
+                //// Navmeshとの距離が0.1になるまで待つ
+                //// 距離が詰まったら、移動モードをNavmeshに切替して、Navmeshの位置を直近のNavmeshに更新
+                //yield return new WaitWhile(() => NavMesh.SamplePosition(m_navMesh.transform.localPosition, out navHit, 0.1f, NavMesh.AllAreas) == false);
+
+                //m_navMesh.Resume();
+                //m_navMesh.Warp(navHit.position);
+                //m_navMesh.updatePosition = true;
+                //m_rbody.isKinematic = true;
             }
-
-            if (!m_navMesh.hasPath)
+            else
             {
-                var currentDestinations = GetTargetDestinations(currentBehavioralPattern);
-                currentDestination = currentDestinations[Random.Range(0, currentDestinations.Count)];
-                m_navMesh.SetDestination(currentDestination.Position);
+                if (!IsRestricted && !isHit)
+                {
+                    //If no destination is set, or if a destination is reached, the next destination is set
+                    if (m_navMesh.hasPath && m_navMesh.remainingDistance < 2.1f)
+                    {
+                        m_navMesh.ResetPath();
+
+                        // change destination
+                        if (currentBehavioralPattern == BehavioralPattern.home)
+                        {
+                            currentBehavioralPattern = BehavioralPattern.work;
+                        }
+                        else if (currentBehavioralPattern == BehavioralPattern.work)
+                        {
+                            currentBehavioralPattern = BehavioralPattern.home;
+                        }
+                        else
+                        {
+                            currentBehavioralPattern = BehavioralPattern.home;
+                        }
+                    }
+
+                    if (!m_navMesh.hasPath)
+                    {
+                        var currentDestinations = GetTargetDestinations(currentBehavioralPattern);
+                        currentDestination = currentDestinations[Random.Range(0, currentDestinations.Count)];
+
+                        //TODO error handling
+                        m_navMesh.SetDestination(currentDestination.Position);
+                    }
+                }
             }
         }
 
