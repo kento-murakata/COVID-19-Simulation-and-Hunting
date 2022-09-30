@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.SceneManagement;
@@ -55,6 +56,7 @@ public class GameManager : MonoBehaviour
     public InputField ratioInput;
     public InputField simTimeInput;
     public Button startSim;
+
     #endregion
 
     #region Property
@@ -180,18 +182,61 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    private Vector3 GetRandomPos()
+    {
+        Debug.Log("GetRandomPos!!");
+        Vector3 randamPos = new Vector3(
+            Random.Range(0.0f, 1024.0f),
+            500,
+            Random.Range(0.0f, 768.0f)
+            );
+
+        return randamPos;
+    }
+    private Vector3 SearchSpwanArea()
+    {
+        Vector3 randomPos = Vector3.zero;
+        float maxDistance = 550.0f;
+        bool isGetSpwanPos = false;
+
+        while (!isGetSpwanPos)
+        {
+            Vector3 rayPosOrg = GetRandomPos();
+
+            Vector3 rayPosDir = new Vector3(
+                rayPosOrg.x,
+                0,
+                rayPosOrg.z
+                );
+
+            RaycastHit hitInfo = new RaycastHit();
+
+            if (Physics.Raycast(rayPosOrg, rayPosDir, out hitInfo, maxDistance))
+            {
+                if (hitInfo.collider.transform.position.y == 0)
+                {
+                    randomPos = hitInfo.collider.transform.position;
+                    isGetSpwanPos = true;
+                }
+            }
+        }
+        return randomPos;
+    }
+
     //Creat a Random Position 
     //size is depend on the plane existed
     public Vector3 LocationDeter()
     {
-        float maxPos = 100.0f;
-        float minPos = -100.0f;
+        float maxPos = 768.0f;
+        float minPos = 0.0f;
 
         Vector3 randomPos = new Vector3(
             Random.Range(minPos, maxPos),
             1,
             Random.Range(minPos, maxPos)
             );
+        Debug.Log("NowSpawning!!");
+        //Vector3 randomPos = SearchSpwanArea();
         return randomPos;
     }
 
