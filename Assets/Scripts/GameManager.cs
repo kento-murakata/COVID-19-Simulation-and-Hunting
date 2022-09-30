@@ -69,9 +69,9 @@ public class GameManager : MonoBehaviour
     {
         Time.timeScale = 0;
         gm_Player = GameObject.Find("Player");
-        gm_NYBlock01 = GameObject.Find("NYBlock01");
+        //gm_NYBlock01 = GameObject.Find("NYBlock01");
         gm_Player.SetActive(false);
-        gm_NYBlock01.SetActive(false);
+        //gm_NYBlock01.SetActive(false);
         GameObject.Find("InputUI").SetActive(true);
         startSim.onClick.AddListener(gameStart);
     }
