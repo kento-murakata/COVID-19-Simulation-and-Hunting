@@ -213,7 +213,7 @@ public class GameManager : MonoBehaviour
 
             if (Physics.Raycast(rayPosOrg, rayPosDir, out hitInfo, maxDistance))
             {
-                if (hitInfo.collider.transform.position.y == 0)
+                if (hitInfo.collider.transform.position.y <= 10)
                 {
                     randomPos = hitInfo.collider.transform.position;
                     isGetSpwanPos = true;
@@ -227,16 +227,16 @@ public class GameManager : MonoBehaviour
     //size is depend on the plane existed
     public Vector3 LocationDeter()
     {
-        float maxPos = 768.0f;
-        float minPos = 0.0f;
+        //float maxPos = 768.0f;
+        //float minPos = 0.0f;
 
-        Vector3 randomPos = new Vector3(
-            Random.Range(minPos, maxPos),
-            1,
-            Random.Range(minPos, maxPos)
-            );
-        Debug.Log("NowSpawning!!");
-        //Vector3 randomPos = SearchSpwanArea();
+        //Vector3 randomPos = new Vector3(
+        //    Random.Range(minPos, maxPos),
+        //    1,
+        //    Random.Range(minPos, maxPos)
+        //    );
+        //Debug.Log("NowSpawning!!");
+        Vector3 randomPos = SearchSpwanArea();
         return randomPos;
     }
 
