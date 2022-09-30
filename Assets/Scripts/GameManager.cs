@@ -55,6 +55,8 @@ public class GameManager : MonoBehaviour
     public InputField ratioInput;
     public InputField simTimeInput;
     public Button startSim;
+    public GameObject gm_Player;
+    public GameObject gm_NYBlock01;
     #endregion
 
     #region Property
@@ -66,6 +68,10 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         Time.timeScale = 0;
+        gm_Player = GameObject.Find("Player");
+        gm_NYBlock01 = GameObject.Find("NYBlock01");
+        gm_Player.SetActive(false);
+        gm_NYBlock01.SetActive(false);
         GameObject.Find("InputUI").SetActive(true);
         startSim.onClick.AddListener(gameStart);
     }
