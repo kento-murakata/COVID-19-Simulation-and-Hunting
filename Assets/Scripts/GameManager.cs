@@ -227,16 +227,16 @@ public class GameManager : MonoBehaviour
     //size is depend on the plane existed
     public Vector3 LocationDeter()
     {
-        //float maxPos = 768.0f;
-        //float minPos = 0.0f;
+        float maxPos = 100.0f;
+        float minPos = -100.0f;
 
-        //Vector3 randomPos = new Vector3(
-        //    Random.Range(minPos, maxPos),
-        //    1,
-        //    Random.Range(minPos, maxPos)
-        //    );
-        //Debug.Log("NowSpawning!!");
-        Vector3 randomPos = SearchSpwanArea();
+        Vector3 randomPos = new Vector3(
+            Random.Range(minPos, maxPos),
+            1,
+            Random.Range(minPos, maxPos)
+            );
+        Debug.Log("NowSpawning!!");
+        //Vector3 randomPos = SearchSpwanArea();
         return randomPos;
     }
 
